@@ -1,6 +1,7 @@
 <template>
   <div class="color-picker">
-
+    <ColorPickerSelectImage />
+    <ColorPickerSelectColor />
   </div>
 </template>
 
@@ -11,6 +12,7 @@
 .color-picker{
   width: 100%;
   min-height: calc(100vh - 60px);
+  display: flex;
   background: $backgroundColor;
 }
 </style>

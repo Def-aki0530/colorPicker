@@ -46,10 +46,10 @@ export default {
 
 .header-right{
   display: flex;
-  margin: 0 15px;
+  margin-right: 15px;
   div{
-    padding: 5px 0;
-    margin: 0 15px;
+    padding: 5px;
+    margin: 0 10px;
     cursor: pointer;
   }
 }
