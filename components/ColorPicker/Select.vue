@@ -65,10 +65,6 @@ export default {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    
-    option{
-      
-    }
   }
 }
 </style>

@@ -21,11 +21,13 @@
       />
       <ColorPickerButton
         :text="'リセット'"
-        
       />
-
     </div>
-    
+    <ColorPickerLabel />
+
+    <ColorPickerArea>
+      <ColorPickerInputColor />
+    </ColorPickerArea>
     
 
   </div>
