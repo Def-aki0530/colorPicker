@@ -4,8 +4,8 @@
         hogehoge
     </div>
     <div class="header-right">
-        <nuxt-link to="/" tag="div" :class="{border:index}">色決定</nuxt-link>
-        <nuxt-link to="/" tag="div" :class="{border:guide}">使い方</nuxt-link>
+        <nuxt-link to="/" :class="{border:index}">色決定</nuxt-link>
+        <nuxt-link to="guide" :class="{border:guide}">使い方</nuxt-link>
     </div>
   </div>
 </template>
@@ -47,7 +47,9 @@ export default {
 .header-right{
   display: flex;
   margin-right: 15px;
-  div{
+  a{
+    color: white;
+    text-decoration: none;
     padding: 5px;
     margin: 0 10px;
     cursor: pointer;
