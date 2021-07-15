@@ -19,7 +19,7 @@ export default {
   display: flex;
   margin: 15px 0;
   p{
-    width: 215px;
+    width: 216px;
     display: flex;
     justify-content: center;
     font-size: 0.8rem;

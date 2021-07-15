@@ -62,13 +62,11 @@ export default {
   },
   methods: {
     selected(value, id) {
-      if(id == 'color-pattern'){
+      if(id === 'color-pattern'){
         this.colorPattern = value;
-        console.log(this.colorPattern);
       }
-      else if(id == 'color-space'){
+      else if(id === 'color-space'){
         this.colorSpace = value;
-        console.log(this.colorSpace);
       }
     }
   }
