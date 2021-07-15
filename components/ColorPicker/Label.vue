@@ -1,9 +1,10 @@
 <template>
   <div class="label">
-    <div>ベースカラー（入力）</div>
-    <div>ベースカラー（出力）</div>
-    <div>影色</div>
-    <div>ハイライト</div>
+    <p>ベースカラー（入力）</p>
+    <div></div>
+    <p>ベースカラー（出力）</p>
+    <p>影色</p>
+    <p>ハイライト</p>
   </div>
 </template>
 
@@ -16,11 +17,16 @@ export default {
 .label{
   width: 100%;
   display: flex;
-  justify-content: space-around;
   margin: 15px 0;
-  div{
+  p{
+    width: 215px;
+    display: flex;
+    justify-content: center;
     font-size: 0.8rem;
     color: $mainColor;
+  }
+  div{
+    width: 100px;
   }
 }
 

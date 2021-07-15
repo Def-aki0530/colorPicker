@@ -1,22 +1,36 @@
 <template>
   <div class="input-color">
-    <label class="color-preview" :style="{background: color}" for="id1" ></label>
-    <input type="color" class="chose-color" id="id1" value="#ffffff" v-model="color">
+    <label class="color-preview" :style="{background: returnColor}" :for="id" ></label>
+    <input type="color" class="chose-color" :id="id" v-model="inputColor" @input="hex2rgb">
     <div class="eyedropper-area">
       <ColorPickerEyedropper />
     </div>
-    <div class="chose-colorcode-area">
-      <div class="chose-colorcode">
+    <div class="input-value-area" v-if="colorSpace === '1'">
+      <div class="input-value">
         <div>R</div>
-        <input type="number" min="0" max="255" step="1" value="255">
+        <input type="number" min="0" max="255" step="1" v-model="r" @input="rgb2hex">
       </div>
-      <div class="chose-colorcode">
+      <div class="input-value">
         <div>G</div>
-        <input type="number" min="0" max="255" step="1" value="255">
+        <input type="number" min="0" max="255" step="1" v-model="g" @input="rgb2hex">
       </div>
-      <div class="chose-colorcode">
+      <div class="input-value">
         <div>B</div>
-        <input type="number" min="0" max="255" step="1" value="255">
+        <input type="number" min="0" max="255" step="1" v-model="b" @input="rgb2hex">
+      </div>  
+    </div>
+    <div class="input-value-area" v-if="colorSpace === '2'">
+      <div class="input-value">
+        <div>H</div>
+        <input type="number" min="0" max="360" step="1" v-model="h" @input="hsv2hex">
+      </div>
+      <div class="input-value">
+        <div>S</div>
+        <input type="number" min="0" max="100" step="1" v-model="s" @input="hsv2hex">
+      </div>
+      <div class="input-value">
+        <div>V</div>
+        <input type="number" min="0" max="100" step="1" v-model="v" @input="hsv2hex">
       </div>  
     </div>
   </div>
@@ -24,10 +38,47 @@
 
 <script> 
 export default {
+  props: {
+    id: {
+      type: String,
+    },
+    colorSpace: {
+      type: String,
+    }
+
+  },
   data() {
     return {
-      color: '#ffffff'
+      inputColor: '#ffffff',
+      returnColor: '#ffffff',
+      hex: '',
+      r: 255,
+      g: 255,
+      b: 255,
+      h: 0,
+      s: 0,
+      v: 100,
+      l: 100,
     }
+  },
+  methods: {
+    hex2rgb() {
+      this.hex = this.inputColor.split('');
+      this.r = parseInt(this.hex[1].toString() + this.hex[2].toString(), 16);
+      this.g = parseInt(this.hex[3].toString() + this.hex[4].toString(), 16);
+      this.b = parseInt(this.hex[5].toString() + this.hex[6].toString(), 16);
+      this.returnColor = this.inputColor;
+    },
+    rgb2hex() {
+      let rHex = ('0' + Number(this.r).toString(16)).slice(-2);
+      let gHex = ("0" + Number(this.g).toString(16)).slice(-2);
+      let bHex = ("0" + Number(this.b).toString(16)).slice(-2);
+      this.returnColor = "#" + rHex + gHex + bHex;
+      this.inputColor = this.returnColor;
+    },
+    hsv2hex(){
+
+    },
   }
 }
 </script>
@@ -72,13 +123,13 @@ export default {
   pointer-events: none;
 }
 
-.chose-colorcode-area{
+.input-value-area{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.chose-colorcode{
+.input-value{
   display: flex;
   align-items: center;
   div{

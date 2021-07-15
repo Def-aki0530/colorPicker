@@ -26,7 +26,10 @@
     <ColorPickerLabel />
 
     <ColorPickerArea>
-      <ColorPickerInputColor />
+      <ColorPickerInputColor
+        :id="'id1'"
+        :colorSpace="colorSpace"
+      />
     </ColorPickerArea>
     
 
@@ -37,6 +40,9 @@
 export default {
   data() {
     return {
+      colorPattern: '1',
+      colorSpace: '1',
+
       defaultPatternNumber: '1',
       patternOptions: [
         { code: '1', name: 'カラーパターン1' },
@@ -48,6 +54,7 @@ export default {
       spaceOptions: [
         { code: '1', name: 'RGB' },
         { code: '2', name: 'HSV' },
+        { code: '3', name: 'HSL' },
       ],
 
 
@@ -55,7 +62,14 @@ export default {
   },
   methods: {
     selected(value, id) {
-
+      if(id == 'color-pattern'){
+        this.colorPattern = value;
+        console.log(this.colorPattern);
+      }
+      else if(id == 'color-space'){
+        this.colorSpace = value;
+        console.log(this.colorSpace);
+      }
     }
   }
 }
@@ -63,7 +77,7 @@ export default {
 
 <style scoped lang="scss">
 .select-color{
-  width: 65%;
+  width: 1248px;
   padding: 60px 60px 0 0;
 }
 

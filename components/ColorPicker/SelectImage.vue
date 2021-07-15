@@ -35,7 +35,7 @@ export default {
 
 <style scoped lang="scss">
 .select-image{
-  width: 35%;
+  width: 672px;
   height: calc(100vh - 60px);
   padding: 60px;
   label{
