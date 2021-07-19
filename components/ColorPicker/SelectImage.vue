@@ -35,9 +35,13 @@ export default {
 
 <style scoped lang="scss">
 .select-image{
-  width: 672px;
+  width: 35%;
   height: calc(100vh - 60px);
   padding: 60px;
+  @include mq(xl) {
+    width: 100%;
+    padding: 30px;
+  }
   label{
     width: 120px;
     height: 40px;

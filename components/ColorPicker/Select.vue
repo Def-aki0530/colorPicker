@@ -1,6 +1,6 @@
 <template>
-  <div class="select">
-    <select :value="value" :style="{width: width}" @input="selected">
+  <div class="select" :style="{width: width}">
+    <select :value="value" @input="selected">
       <option v-for="option in options" :key="option.code" :value="option.code">
         {{ option.name }}
       </option>
@@ -39,7 +39,7 @@ export default {
 <style scoped lang="scss">
 .select{
   position: relative;
-  margin-right: 10px;
+  margin: 0 10px 10px 0;
   &:after{
     content: url( 'data:image/svg+xml;utf-8,<svg fill="%233B3B3B" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>');
     width: 1rem;
@@ -52,6 +52,7 @@ export default {
     pointer-events: none;
   }
   select{
+    width: 100%;
     height: 40px;
     font-size: 0.8rem;
     font-family: 'Roboto', 'Noto Sans JP';

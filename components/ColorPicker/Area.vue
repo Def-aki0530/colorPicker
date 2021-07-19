@@ -13,5 +13,9 @@ export default {
 .area{
   width: 100%;
   display: flex;
+  margin: 10px 0;
+  @include mq(md) {
+    flex-direction: column;
+  }
 }
 </style>

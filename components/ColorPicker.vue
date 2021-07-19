@@ -14,5 +14,8 @@
   min-height: calc(100vh - 60px);
   display: flex;
   background: $backgroundColor;
+  @include mq(xl) {
+    flex-direction: column;
+  }
 }
 </style>

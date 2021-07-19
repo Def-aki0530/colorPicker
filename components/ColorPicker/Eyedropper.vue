@@ -13,9 +13,21 @@ export default {
 
 <style scoped lang="scss">
 .eyedropper{
-  width: 15px;
-  height: 15px;
-  fill: white;
-  padding:  5.5px 7.5px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  &::before{
+    content:"";
+    display: block;
+    padding-top: 100%;
+  }
+  svg{
+    width: 60%;
+    height: 60%;
+    fill: white;
+  }
 }
 </style>
