@@ -114,11 +114,9 @@ export default {
       }
       else if(this.colorSpace === '2'){
         this.rgb2hsl();
-        this.hl = this.hv;
       }
       else if(this.colorSpace === '3'){
         this.rgb2hsv();
-        this.hv = this.hl;
       }
       this.$emit("returnColor", this.returnColor);
     },
@@ -154,9 +152,9 @@ export default {
       let s = max == 0 ? 0 : diff / max ;
       let v = max ;
 
-      this.hv = Math.floor(h);
-      this.sv = Math.floor(s*100);
-      this.vv = Math.floor(v*100);
+      this.hv = Math.round(h);
+      this.sv = Math.round(s*100);
+      this.vv = Math.round(v*100);
     },
     hsv2rgb() {
       let h = this.hv / 60 ;
@@ -206,9 +204,9 @@ export default {
             break ;
         }
 
-        this.r = Math.floor(rgb[0] * 255);
-        this.g = Math.floor(rgb[1] * 255);
-        this.b = Math.floor(rgb[2] * 255);
+        this.r = Math.round(rgb[0] * 255);
+        this.g = Math.round(rgb[1] * 255);
+        this.b = Math.round(rgb[2] * 255);
         this.rgb2hex();
       }
     },
@@ -260,9 +258,9 @@ export default {
         s = 0;
       }
       
-      this.hl = Math.floor(h);
-      this.sl = Math.floor(s);
-      this.ll = Math.floor(l);
+      this.hl = Math.round(h);
+      this.sl = Math.round(s);
+      this.ll = Math.round(l);
     },
     hsl2rgb() {
       let h = this.hl;
@@ -315,9 +313,9 @@ export default {
         b = ((HUE_MAX - h) / hp) * (max - min) + min;
       }
 
-      this.r = Math.floor(r * RGB_MAX);
-      this.g = Math.floor(g * RGB_MAX);
-      this.b = Math.floor(b * RGB_MAX);
+      this.r = Math.round(r * RGB_MAX);
+      this.g = Math.round(g * RGB_MAX);
+      this.b = Math.round(b * RGB_MAX);
       this.rgb2hex();
     },
   }
