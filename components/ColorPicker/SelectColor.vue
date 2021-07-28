@@ -27,7 +27,7 @@
           <ColorPickerInputColor
             :id="index"
             :colorSpace="colorSpace"
-            :label="'ベースカラー(入力)'"
+            :label="'基本色(入力)'"
             :inputColor="i.inputColor"
             @returnColor="i.inputColor = $event"
           />
@@ -36,7 +36,7 @@
         <div class="result-color-area">
           <ColorPickerResultColor
             :colorSpace="colorSpace"
-            :label="'ベースカラー(出力)'"
+            :label="'基本色(出力)'"
           />
           <ColorPickerResultColor :colorSpace="colorSpace" :label="'影色'" />
           <ColorPickerResultColor

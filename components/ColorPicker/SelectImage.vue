@@ -74,8 +74,10 @@ export default {
   border: $mainColor dashed 2px;
   margin: 15px 0 0 0;
   img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: 100%;
   }
 }
 </style>
