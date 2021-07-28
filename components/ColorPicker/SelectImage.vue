@@ -18,20 +18,23 @@
 export default {
   data() {
     return {
+      file: {},
       data: {
-        text: "",
         image: "",
         name: "",
+        type: "",
       },
     };
   },
   methods: {
     setImage(e) {
-      const file = (e.target.files || e.dataTransfer)[0];
-      if (file.type.startsWith("image/")) {
-        this.data.image = window.URL.createObjectURL(file);
-        this.data.name = file.name;
-        this.data.type = file.type;
+      this.file = (e.target.files || e.dataTransfer)[0];
+      if (this.file) {
+        if (this.file.type.startsWith("image/")) {
+          this.data.image = window.URL.createObjectURL(this.file);
+          this.data.name = this.file.name;
+          this.data.type = this.file.type;
+        }
       }
     },
   },
