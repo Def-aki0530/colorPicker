@@ -1,5 +1,5 @@
 <template>
-  <div class="select" :style="{width: width}">
+  <div class="select" :style="{ width: width }">
     <select :value="value" @input="selected">
       <option v-for="option in options" :key="option.code" :value="option.code">
         {{ option.name }}
@@ -13,11 +13,11 @@ export default {
   props: {
     id: {
       type: String,
-      default: '',
+      default: "",
     },
     value: {
       type: String,
-      default: '',
+      default: "",
       required: true,
     },
     options: {
@@ -26,22 +26,22 @@ export default {
     },
     width: {
       type: String,
-    }
+    },
   },
   methods: {
     selected($event) {
-      this.$emit('selected', $event.target.value, this.id);
+      this.$emit("selected", $event.target.value, this.id);
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
-.select{
+.select {
   position: relative;
   margin: 0 10px 10px 0;
-  &:after{
-    content: url( 'data:image/svg+xml;utf-8,<svg fill="%233B3B3B" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>');
+  &:after {
+    content: url('data:image/svg+xml;utf-8,<svg fill="%233B3B3B" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>');
     width: 1rem;
     height: 1rem;
     display: block;
@@ -51,11 +51,11 @@ export default {
     transform: translatey(-70%);
     pointer-events: none;
   }
-  select{
+  select {
     width: 100%;
     height: 40px;
     font-size: 0.8rem;
-    font-family: 'Roboto', 'Noto Sans JP';
+    font-family: "Roboto", "Noto Sans JP";
     outline: none;
     border: none;
     border-radius: 5px;

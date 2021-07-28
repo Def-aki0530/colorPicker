@@ -38,10 +38,7 @@
             :colorSpace="colorSpace"
             :label="'ベースカラー(出力)'"
           />
-          <ColorPickerResultColor
-            :colorSpace="colorSpace"
-            :label="'影色'"
-          />
+          <ColorPickerResultColor :colorSpace="colorSpace" :label="'影色'" />
           <ColorPickerResultColor
             :colorSpace="colorSpace"
             :label="'ハイライト'"
@@ -51,7 +48,6 @@
 
       <ColorPickerPlusButton @addValue="addValue()" />
     </div>
-    
   </div>
 </template>
 
@@ -95,18 +91,18 @@ export default {
       }
     },
     deleteValue(index) {
-      console.log(index)
-      this.colorValue.splice(index, 1)
-      console.log(this.colorValue)
+      console.log(index);
+      this.colorValue.splice(index, 1);
+      console.log(this.colorValue);
     },
-    addValue(){
+    addValue() {
       this.colorValue.push({
-          inputColor: "#ffffff",
-          baseColor: "#ffffff",
-          shadowColor: "#ffffff",
-          hilightColor: "#ffffff",
-      })
-    }
+        inputColor: "#ffffff",
+        baseColor: "#ffffff",
+        shadowColor: "#ffffff",
+        hilightColor: "#ffffff",
+      });
+    },
   },
 };
 </script>
@@ -121,7 +117,7 @@ export default {
   }
 }
 
-.input-color-container{
+.input-color-container {
   width: 100%;
   height: calc(100vh - 240px);
   overflow-y: scroll;

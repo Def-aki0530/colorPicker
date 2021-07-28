@@ -5,18 +5,16 @@
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>
 
 <style scoped lang="scss">
-.plus-button{
-  button{
+.plus-button {
+  button {
     width: 21%;
     height: 40px;
     font-size: 1rem;
-    font-family: 'Roboto', 'Noto Sans JP';
+    font-family: "Roboto", "Noto Sans JP";
     background: $mainColor;
     border: none;
     border-radius: 5px;
@@ -25,7 +23,7 @@ export default {
     cursor: pointer;
     margin-top: 10px;
     @include mq(md) {
-        width: 30%;
+      width: 30%;
     }
   }
 }

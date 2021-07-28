@@ -5,12 +5,11 @@
 </template>
 
 <script>
-export default {
-}
+export default {};
 </script>
 
 <style scoped lang="scss">
-.area{
+.area {
   width: 100%;
   display: flex;
   margin: 10px 0;

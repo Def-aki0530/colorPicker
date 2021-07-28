@@ -9,7 +9,7 @@
 </script>
 
 <style scoped lang="scss">
-.color-picker{
+.color-picker {
   width: 100%;
   min-height: calc(100vh - 60px);
   display: flex;

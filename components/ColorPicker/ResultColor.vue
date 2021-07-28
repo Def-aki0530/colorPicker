@@ -2,7 +2,7 @@
   <div class="result-color">
     <div class="result-color-label">{{ label }}</div>
     <div class="result-color-contents">
-      <label class="color-preview" :style="{background: '#ffffff' }"></label>
+      <label class="color-preview" :style="{ background: '#ffffff' }"></label>
       <div class="result-value-area" v-if="colorSpace === '1'">
         <div class="result-value">
           <p>R</p>
@@ -15,7 +15,7 @@
         <div class="result-value">
           <p>B</p>
           <div>255</div>
-        </div>  
+        </div>
       </div>
       <div class="result-value-area" v-if="colorSpace === '2'">
         <div class="result-value">
@@ -29,7 +29,7 @@
         <div class="result-value">
           <p>V</p>
           <div>100</div>
-        </div>  
+        </div>
       </div>
       <div class="result-value-area" v-if="colorSpace === '3'">
         <div class="result-value">
@@ -43,13 +43,13 @@
         <div class="result-value">
           <p>L</p>
           <div>100</div>
-        </div>  
+        </div>
       </div>
-    </div>  
+    </div>
   </div>
 </template>
 
-<script> 
+<script>
 export default {
   props: {
     id: {
@@ -60,14 +60,13 @@ export default {
     },
     label: {
       type: String,
-    }
-
+    },
   },
   data() {
     return {
-      inputColor: '#ffffff',
-      returnColor: '#ffffff',
-      hex: '',
+      inputColor: "#ffffff",
+      returnColor: "#ffffff",
+      hex: "",
       r: 255,
       g: 255,
       b: 255,
@@ -77,21 +76,19 @@ export default {
       hl: 0,
       sl: 0,
       ll: 100,
-    }
+    };
   },
-  methods: {
-    
-  }
-}
+  methods: {},
+};
 </script>
 
 <style scoped lang="scss">
-.result-color{
+.result-color {
   width: 30%;
   height: auto;
 }
 
-.result-color-label{
+.result-color-label {
   width: 100%;
   font-size: 0.8rem;
   color: $mainColor;
@@ -99,44 +96,44 @@ export default {
   margin-bottom: 10px;
 }
 
-.result-color-contents{
+.result-color-contents {
   width: 100%;
   display: flex;
   align-items: space-between;
   position: relative;
 }
 
-.color-preview{
+.color-preview {
   width: 46%;
   position: relative;
   border-radius: 5px;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
-  &::before{
+  &::before {
     content: "";
     display: block;
     padding-top: 100%;
   }
 }
 
-.result-value-area{
+.result-value-area {
   width: 54%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.result-value{
+.result-value {
   width: 100%;
   height: 30%;
   display: flex;
   align-items: center;
-  p{
+  p {
     width: 22%;
     font-size: 0.8rem;
     color: $mainColor;
     text-align: center;
   }
-  div{
+  div {
     width: 78%;
     height: 100%;
     display: flex;
@@ -148,7 +145,5 @@ export default {
     border-radius: 5px;
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
   }
-
 }
-
 </style>

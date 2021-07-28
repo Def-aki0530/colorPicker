@@ -1,6 +1,6 @@
 <template>
   <div class="button">
-    <button >{{ text }}</button>
+    <button>{{ text }}</button>
   </div>
 </template>
 
@@ -10,18 +10,17 @@ export default {
     text: {
       type: String,
     },
-    
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
-.button{
-  button{
+.button {
+  button {
     width: 120px;
     height: 40px;
     font-size: 0.8rem;
-    font-family: 'Roboto', 'Noto Sans JP';
+    font-family: "Roboto", "Noto Sans JP";
     background: $mainColor;
     border: none;
     border-radius: 5px;
@@ -31,6 +30,4 @@ export default {
     margin: 0 10px 10px 0;
   }
 }
-
-
 </style>
