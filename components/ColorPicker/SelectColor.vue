@@ -22,7 +22,7 @@
     </div>
 
     <div class="input-color-container">
-      <ColorPickerArea v-for="(i, index) in colorValue" :key="index">
+      <ColorPickerArea v-for="(i, index) in colorValue" :key="i.id">
         <div class="input-color-area">
           <ColorPickerInputColor
             :id="index"
@@ -55,6 +55,7 @@
 export default {
   data() {
     return {
+      colorValueId: 0,
       colorPattern: "1",
       colorSpace: "1",
 
@@ -74,6 +75,7 @@ export default {
 
       colorValue: [
         {
+          id: 0,
           inputColor: "#ffffff",
           baseColor: "#ffffff",
           shadowColor: "#ffffff",
@@ -97,6 +99,7 @@ export default {
     },
     addValue() {
       this.colorValue.push({
+        id: ++this.colorValueId,
         inputColor: "#ffffff",
         baseColor: "#ffffff",
         shadowColor: "#ffffff",
