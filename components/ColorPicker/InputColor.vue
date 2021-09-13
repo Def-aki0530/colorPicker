@@ -164,7 +164,6 @@ export default {
   },
   methods: {
     hex2rgb(input) {
-      console.log(input);
       this.hex = input.split("");
       this.r = parseInt(this.hex[1].toString() + this.hex[2].toString(), 16);
       this.g = parseInt(this.hex[3].toString() + this.hex[4].toString(), 16);
