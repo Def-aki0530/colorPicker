@@ -13,19 +13,21 @@ export default {
   props: {
     id: {
       type: String,
-      default: "",
+      default: '',
     },
     value: {
       type: String,
-      default: "",
+      default: '',
       required: true,
     },
     options: {
       type: Array,
+      default: () => [],
       required: true,
     },
     width: {
       type: String,
+      default: '',
     },
   },
   methods: {

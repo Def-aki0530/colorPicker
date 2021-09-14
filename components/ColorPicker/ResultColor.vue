@@ -2,47 +2,47 @@
   <div class="result-color">
     <div class="result-color-label">{{ label }}</div>
     <div class="result-color-contents">
-      <label class="color-preview" :style="{ background: '#ffffff' }"></label>
+      <label class="color-preview" :style="{ background: hexResultColor }"></label>
       <div class="result-value-area" v-if="colorSpace === '1'">
         <div class="result-value">
           <p>R</p>
-          <div>255</div>
+          <div>{{ rgbResultColor[0] }}</div>
         </div>
         <div class="result-value">
           <p>G</p>
-          <div>255</div>
+          <div>{{ rgbResultColor[1] }}</div>
         </div>
         <div class="result-value">
           <p>B</p>
-          <div>255</div>
+          <div>{{ rgbResultColor[2] }}</div>
         </div>
       </div>
       <div class="result-value-area" v-if="colorSpace === '2'">
         <div class="result-value">
           <p>H</p>
-          <div>0</div>
+          <div>{{ hsvResultColor[0] }}</div>
         </div>
         <div class="result-value">
           <p>S</p>
-          <div>0</div>
+          <div>{{ hsvResultColor[1] }}</div>
         </div>
         <div class="result-value">
           <p>V</p>
-          <div>100</div>
+          <div>{{ hsvResultColor[2] }}</div>
         </div>
       </div>
       <div class="result-value-area" v-if="colorSpace === '3'">
         <div class="result-value">
           <p>H</p>
-          <div>0</div>
+          <div>{{ hslResultColor[0] }}</div>
         </div>
         <div class="result-value">
           <p>S</p>
-          <div>0</div>
+          <div>{{ hslResultColor[1] }}</div>
         </div>
         <div class="result-value">
           <p>L</p>
-          <div>100</div>
+          <div>{{ hslResultColor[2] }}</div>
         </div>
       </div>
     </div>
@@ -54,22 +54,37 @@ export default {
   props: {
     id: {
       type: String,
+      default: '',
     },
     colorSpace: {
       type: String,
+      default: ''
     },
     label: {
       type: String,
+      default: ''
     },
+    hexResultColor: {
+      type: String,
+      default: '',
+    },
+    rgbResultColor: {
+      type: Array,
+      default: () => [],
+    },
+    hsvResultColor: {
+      type: Array,
+      default: () => [],
+    },
+    hslResultColor: {
+      type: Array,
+      default: () => [],
+    }
   },
   data() {
     return {
       inputColor: "#ffffff",
       returnColor: "#ffffff",
-      hex: "",
-      r: 255,
-      g: 255,
-      b: 255,
       hv: 0,
       sv: 0,
       vv: 100,

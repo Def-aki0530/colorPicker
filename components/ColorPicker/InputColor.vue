@@ -133,15 +133,19 @@ export default {
   props: {
     id: {
       type: Number,
+      default: 0,
     },
     colorSpace: {
       type: String,
+      default: '',
     },
     label: {
       type: String,
+      default: '',
     },
     inputColor: {
       type: String,
+      default: '',
     },
   },
   data() {

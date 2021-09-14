@@ -37,14 +37,26 @@
           <ColorPickerResultColor
             :colorSpace="colorSpace"
             :label="'基本色(出力)'"
+            :hexResultColor="i.hexBaseColor"
+            :rgbResultColor="i.rgbBaseColor"
+            :hsvResultColor="i.hsvBaseColor"
+            :hslResultColor="i.hslBaseColor"
           />
           <ColorPickerResultColor
             :colorSpace="colorSpace"
             :label="'影色'" 
+            :hexResultColor="i.hexShadowColor"
+            :rgbResultColor="i.rgbShadowColor"
+            :hsvResultColor="i.hsvShadowColor"
+            :hslResultColor="i.hslShadowColor"
           />
           <ColorPickerResultColor
             :colorSpace="colorSpace"
             :label="'ハイライト'"
+            :hexResultColor="i.hexHilightColor"
+            :rgbResultColor="i.rgbHilightColor"
+            :hsvResultColor="i.hsvHilightColor"
+            :hslResultColor="i.hslHilightColor"
           />
         </div>
       </ColorPickerArea>
@@ -83,9 +95,18 @@ export default {
         {
           id: 0,
           inputColor: "#ffffff",
-          baseColor: [255, 255, 255],
-          shadowColor: [255, 255, 255],
-          hilightColor: [255, 255, 255],
+          hexBaseColor: "#ffffff",
+          rgbBaseColor: [255, 255, 255],
+          hsvBaseColor: [0, 0, 100],
+          hslBaseColor: [0, 0, 100],
+          hexShadowColor: "#ffffff",
+          rgbShadowColor: [255, 255, 255],
+          hsvShadowColor: [0, 0, 100],
+          hslShadowColor: [0, 0, 100],
+          hexHilightColor: "#ffffff",
+          rgbHilightColor: [255, 255, 255],
+          hsvHilightColor: [0, 0, 100],
+          hslHilightColor: [0, 0, 100],
           nearColor:[
             [0, 255],
             [0, 255],
@@ -114,9 +135,18 @@ export default {
       this.colorValue.push({
         id: ++this.colorValueId,
         inputColor: "#ffffff",
-        baseColor: [255, 255, 255],
-        shadowColor: [255, 255, 255],
-        hilightColor: [255, 255, 255],
+        hexBaseColor: "#ffffff",
+        rgbBaseColor: [255, 255, 255],
+        hsvBaseColor: [0, 0, 100],
+        hslBaseColor: [0, 0, 100],
+        hexShadowColor: "#ffffff",
+        rgbShadowColor: [255, 255, 255],
+        hsvShadowColor: [0, 0, 100],
+        hslShadowColor: [0, 0, 100],
+        hexHilightColor: "#ffffff",
+        rgbHilightColor: [255, 255, 255],
+        hsvHilightColor: [0, 0, 100],
+        hslHilightColor: [0, 0, 100],
         nearColor:[
           [0, 255],
           [0, 255],
@@ -146,14 +176,20 @@ export default {
             this.colorValue[i].inputNearColor[1] = len;
           }
         }
-        //baseColorの生成
-        const baseR = (res.data[this.colorValue[i].inputNearColor[0]][0] + rgbInputColor[0]) / 2;
-        const baseG = (res.data[this.colorValue[i].inputNearColor[0]][1] + rgbInputColor[1]) / 2;
-        const baseB = (res.data[this.colorValue[i].inputNearColor[0]][2] + rgbInputColor[2]) / 2;
 
-        this.colorValue[i].baseColor = [baseR, baseG, baseB];
+        //baseColorの生成
+        const baseR = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][0]) + rgbInputColor[0]) / 2);
+        const baseG = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][1]) + rgbInputColor[1]) / 2);
+        const baseB = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][2]) + rgbInputColor[2]) / 2);
+
+        this.colorValue[i].rgbBaseColor = [baseR, baseG, baseB];
+        this.colorValue[i].hexBaseColor = this.rgb2hex(this.colorValue[i].rgbBaseColor);
+        this.colorValue[i].hsvBaseColor = this.rgb2hsv(this.colorValue[i].rgbBaseColor);
+        this.colorValue[i].hslBaseColor = this.rgb2hsl(this.colorValue[i].rgbBaseColor);
       }
-      console.log(this.colorValue)
+
+      //baseColorに近い色を5個取得
+      
       
     },
     resetColor(){
@@ -193,10 +229,116 @@ export default {
       const r = parseInt(hex[1].toString() + hex[2].toString(), 16);
       const g = parseInt(hex[3].toString() + hex[4].toString(), 16);
       const b = parseInt(hex[5].toString() + hex[6].toString(), 16);
-      let rgb = [r,g,b]
+      const rgb = [r,g,b]
 
       return rgb
-    }
+    
+    },
+    rgb2hex(input) {
+      const rHex = ("0" + Number(input[0]).toString(16)).slice(-2);
+      const gHex = ("0" + Number(input[1]).toString(16)).slice(-2);
+      const bHex = ("0" + Number(input[2]).toString(16)).slice(-2);
+      const hex = "#" + rHex + gHex + bHex;
+      
+      return hex
+    
+    },
+    rgb2hsv(input) {
+      let r = Number(input[0]) / 255;
+      let g = Number(input[1]) / 255;
+      let b = Number(input[2]) / 255;
+
+      let max = Math.max(r, g, b);
+      let min = Math.min(r, g, b);
+      let diff = max - min;
+
+      let h = 0;
+
+      switch (min) {
+        case max:
+          h = 0;
+          break;
+
+        case r:
+          h = 60 * ((b - g) / diff) + 180;
+          break;
+
+        case g:
+          h = 60 * ((r - b) / diff) + 300;
+          break;
+
+        case b:
+          h = 60 * ((g - r) / diff) + 60;
+          break;
+      }
+
+      let s = max == 0 ? 0 : diff / max;
+      let v = max;
+
+      const hv = Math.round(h);
+      const sv = Math.round(s * 100);
+      const vv = Math.round(v * 100);
+      const hsv = [hv, sv, vv];
+
+      return hsv
+
+    },
+    rgb2hsl(input) {
+      let r = Number(input[0]);
+      let g = Number(input[1]);
+      let b = Number(input[2]);
+
+      const RGB_MAX = 255;
+      const HUE_MAX = 360;
+      const SATURATION_MAX = 100;
+      const LIGHTNESS_MAX = 100;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h, s, l;
+
+      // Hue
+      const hp = HUE_MAX / 6;
+      if (max == min) {
+        h = 0;
+      } else if (r == max) {
+        h = hp * ((g - b) / (max - min));
+      } else if (g == max) {
+        h = hp * ((b - r) / (max - min)) + HUE_MAX / 3;
+      } else {
+        h = hp * ((r - g) / (max - min)) + (HUE_MAX * 2) / 3;
+      }
+      if (h < 0) {
+        h += HUE_MAX;
+      }
+
+      // Saturation
+      const cnt = (max + min) / 2;
+      if (cnt < RGB_MAX / 2) {
+        if (max + min <= 0) {
+          s = 0;
+        } else {
+          s = ((max - min) / (max + min)) * SATURATION_MAX;
+        }
+      } else {
+        s = ((max - min) / (RGB_MAX * 2 - max - min)) * SATURATION_MAX;
+      }
+
+      // Lightness
+      l = ((max + min) / RGB_MAX / 2) * LIGHTNESS_MAX;
+
+      if (isNaN(s)) {
+        s = 0;
+      }
+
+      const hl = Math.round(h);
+      const sl = Math.round(s);
+      const ll = Math.round(l);
+      const hsl = [hl, sl, ll];
+
+      return hsl
+
+    },
   },
 };
 </script>
