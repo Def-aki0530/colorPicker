@@ -80,20 +80,7 @@ export default {
       type: Array,
       default: () => [],
     }
-  },
-  data() {
-    return {
-      inputColor: "#ffffff",
-      returnColor: "#ffffff",
-      hv: 0,
-      sv: 0,
-      vv: 100,
-      hl: 0,
-      sl: 0,
-      ll: 100,
-    };
-  },
-  methods: {},
+  }
 };
 </script>
 

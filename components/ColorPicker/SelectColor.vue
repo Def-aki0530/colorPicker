@@ -108,12 +108,12 @@ export default {
           hsvHilightColor: [0, 0, 100],
           hslHilightColor: [0, 0, 100],
           nearColor:[
-            [0, 255],
-            [0, 255],
-            [0, 255],
-            [0, 255],
-            [0, 255],
-            [0, 255],
+            [0, 360],
+            [0, 360],
+            [0, 360],
+            [0, 360],
+            [0, 360],
+            [0, 360]
           ],
           inputNearColor: [0, 255],
         },
@@ -148,81 +148,339 @@ export default {
         hsvHilightColor: [0, 0, 100],
         hslHilightColor: [0, 0, 100],
         nearColor:[
-          [0, 255],
-          [0, 255],
-          [0, 255],
-          [0, 255],
-          [0, 255],
-          [0, 255],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360]
         ],
-        inputNearColor: [0, 255],
+        inputNearColor: [0, 360],
       });
     },
     async createColor(){
       //colorPatternのCSVファイルの読み込み
       const fileName = "color" + this.colorPattern + ".csv";
       const res = await fetch("./data/" + fileName).then(data => data.text()).then(v => Papa.parse(v));
-      //inputColorに最も近い色の取得
-      let rgbInputColor = []; 
-      for(let i = 0; i < this.colorValue.length; i++){
+
+      let rgbInputColor = [];
+      let hsvInputColor = []; 
+      let csvBaseColor = [];
+      let len;
+      let i, j, k, l;
+      let baseH, baseS, baseV;
+
+      for(i = 0; i < this.colorValue.length; i++){
+        //inputNearColorの初期化
+        this.colorValue[i].inputNearColor = [0, 360];
+        //inputColorに最も近い色の取得
         rgbInputColor = this.hex2rgb(this.colorValue[i].inputColor);
-        let csvBaseColor = [];
-        let len;
-        for(let j = 1; j < res.data.length; j++){
+        hsvInputColor = this.rgb2hsv(rgbInputColor);
+        for(j = 1; j < res.data.length; j++){
           csvBaseColor = [res.data[j][0], res.data[j][1], res.data[j][2]];
-          len = this.calcLen(rgbInputColor, csvBaseColor);
+          len = this.calcLen(hsvInputColor, csvBaseColor);
           if(len < this.colorValue[i].inputNearColor[1]){
             this.colorValue[i].inputNearColor[0] = j;
             this.colorValue[i].inputNearColor[1] = len;
           }
         }
+        //nearColorの初期化
+        this.colorValue[i].nearColor = [
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360]
+        ];
 
         //baseColorの生成
-        const baseR = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][0]) + rgbInputColor[0]) / 2);
-        const baseG = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][1]) + rgbInputColor[1]) / 2);
-        const baseB = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][2]) + rgbInputColor[2]) / 2);
+        baseH = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][0]) + hsvInputColor[0]) / 2);
+        baseS = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][1]) + hsvInputColor[1]) / 2);
+        baseV = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][2]) + hsvInputColor[2]) / 2);
 
-        this.colorValue[i].rgbBaseColor = [baseR, baseG, baseB];
+        this.colorValue[i].hsvBaseColor = [baseH, baseS, baseV];
+        this.colorValue[i].rgbBaseColor = this.hsv2rgb(this.colorValue[i].hsvBaseColor);
         this.colorValue[i].hexBaseColor = this.rgb2hex(this.colorValue[i].rgbBaseColor);
-        this.colorValue[i].hsvBaseColor = this.rgb2hsv(this.colorValue[i].rgbBaseColor);
         this.colorValue[i].hslBaseColor = this.rgb2hsl(this.colorValue[i].rgbBaseColor);
-      }
 
-      //baseColorに近い色を5個取得
-      
-      
-    },
-    resetColor(){
-      console.log("move reset");
-    },
-    searchInputNearColor(){
+        //baseColorに近い色を5個取得
+        for(j = 1; j < res.data.length; j++){
+          csvBaseColor = [res.data[j][0], res.data[j][1], res.data[j][2]];
+          len = this.calcLen(this.colorValue[i].hsvBaseColor, csvBaseColor);
+          if(len < this.colorValue[i].nearColor[5][1]){
+            this.colorValue[i].nearColor[5][0] = j;
+            this.colorValue[i].nearColor[5][1] = len;
 
-    },
-    sortColor(a){
-      for(let i = 0; i < res.data.length; i++){
-        let len = calcLen(a, res.data[i])
-        if(len < nearColor[5][1]){
-          nearColor[5][0] = i
-          nearColor[5][1] = len
-
-          // バブルソート
-          for(let k = 0; k < nearColor.length; k++){
-            for(let l = nearColor.length-1; l > k ; l-- ){
-              if(nearColor[l][1] < nearColor[l-1][1]){
-                let tmp1 = nearColor[l][0];
-                let tmp2 = nearColor[l][1];
-                nearColor[l][0] = nearColor[l-1][0];
-                nearColor[l][1] = nearColor[l-1][1];
-                nearColor[l-1][0] =tmp1;
-                nearColor[l-1][1] =tmp2;
+            // バブルソート
+            for(k = 0; k < this.colorValue[i].nearColor.length; k++){
+              for(l = this.colorValue[i].nearColor.length-1; l > k ; l--){
+                if(this.colorValue[i].nearColor[l][1] < this.colorValue[i].nearColor[l-1][1]){
+                  let tmp1 = this.colorValue[i].nearColor[l][0];
+                  let tmp2 = this.colorValue[i].nearColor[l][1];
+                  this.colorValue[i].nearColor[l][0] = this.colorValue[i].nearColor[l-1][0];
+                  this.colorValue[i].nearColor[l][1] = this.colorValue[i].nearColor[l-1][1];
+                  this.colorValue[i].nearColor[l-1][0] =tmp1;
+                  this.colorValue[i].nearColor[l-1][1] =tmp2;
+                }
               }
             }
           }
         }
+
+        //影色Hの算出
+        const shadowH = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[1][0]][3]) + Number(res.data[this.colorValue[i].nearColor[2][0]][3])) / 5);
+        this.colorValue[i].hsvShadowColor[0] = shadowH;
+
+        //影色Sの算出
+        const shadowS = [
+          [res.data[this.colorValue[i].nearColor[0][0]][0], res.data[this.colorValue[i].nearColor[0][0]][1], res.data[this.colorValue[i].nearColor[0][0]][2], res.data[this.colorValue[i].nearColor[0][0]][4]],
+          [res.data[this.colorValue[i].nearColor[1][0]][0], res.data[this.colorValue[i].nearColor[1][0]][1], res.data[this.colorValue[i].nearColor[1][0]][2], res.data[this.colorValue[i].nearColor[1][0]][4]],
+          [res.data[this.colorValue[i].nearColor[2][0]][0], res.data[this.colorValue[i].nearColor[2][0]][1], res.data[this.colorValue[i].nearColor[2][0]][2], res.data[this.colorValue[i].nearColor[2][0]][4]],
+          [res.data[this.colorValue[i].nearColor[3][0]][0], res.data[this.colorValue[i].nearColor[3][0]][1], res.data[this.colorValue[i].nearColor[3][0]][2], res.data[this.colorValue[i].nearColor[3][0]][4]],
+          [res.data[this.colorValue[i].nearColor[4][0]][0], res.data[this.colorValue[i].nearColor[4][0]][1], res.data[this.colorValue[i].nearColor[4][0]][2], res.data[this.colorValue[i].nearColor[4][0]][4]]
+        ];
+
+        const ssMaterial = this.multipleRegressionAnalysis(shadowS);
+        this.colorValue[i].hsvShadowColor[1] = parseInt((ssMaterial[0]*baseH) + (ssMaterial[1]*baseS) + (ssMaterial[2]*baseV) + ssMaterial[3]);
+        if((this.colorValue[i].hsvShadowColor[1] < 0)||(this.colorValue[i].hsvShadowColor[1] > 100)){
+          this.colorValue[i].hsvShadowColor[1] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[1][0]][4]) + Number(res.data[this.colorValue[i].nearColor[2][0]][4])) / 5);
+          console.log("no data shadowS " + i);
+        }
+
+        //影色Vの算出
+        const shadowV = [
+          [res.data[this.colorValue[i].nearColor[0][0]][0], res.data[this.colorValue[i].nearColor[0][0]][1], res.data[this.colorValue[i].nearColor[0][0]][2], res.data[this.colorValue[i].nearColor[0][0]][5]],
+          [res.data[this.colorValue[i].nearColor[1][0]][0], res.data[this.colorValue[i].nearColor[1][0]][1], res.data[this.colorValue[i].nearColor[1][0]][2], res.data[this.colorValue[i].nearColor[1][0]][5]],
+          [res.data[this.colorValue[i].nearColor[2][0]][0], res.data[this.colorValue[i].nearColor[2][0]][1], res.data[this.colorValue[i].nearColor[2][0]][2], res.data[this.colorValue[i].nearColor[2][0]][5]],
+          [res.data[this.colorValue[i].nearColor[3][0]][0], res.data[this.colorValue[i].nearColor[3][0]][1], res.data[this.colorValue[i].nearColor[3][0]][2], res.data[this.colorValue[i].nearColor[3][0]][5]],
+          [res.data[this.colorValue[i].nearColor[4][0]][0], res.data[this.colorValue[i].nearColor[4][0]][1], res.data[this.colorValue[i].nearColor[4][0]][2], res.data[this.colorValue[i].nearColor[4][0]][5]]
+        ];
+
+        const svMaterial = this.multipleRegressionAnalysis(shadowV);
+        this.colorValue[i].hsvShadowColor[2] = parseInt((svMaterial[0]*baseH) + (svMaterial[1]*baseS) + (svMaterial[2]*baseV) + svMaterial[3]);
+        if((this.colorValue[i].hsvShadowColor[2] < 0)||(this.colorValue[i].hsvShadowColor[2] > 100)){
+          this.colorValue[i].hsvShadowColor[2] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[1][0]][5]) + Number(res.data[this.colorValue[i].nearColor[2][0]][5])) / 5);
+          console.log("no data shadowV " + i)
+        }
+
+        this.colorValue[i].rgbShadowColor = this.hsv2rgb(this.colorValue[i].hsvShadowColor);
+        this.colorValue[i].hexShadowColor = this.rgb2hex(this.colorValue[i].rgbShadowColor);
+        this.colorValue[i].hslShadowColor = this.rgb2hsl(this.colorValue[i].rgbShadowColor);
+
       }
+    },
+    resetColor(){
+      console.log("move reset");
+    },
+    //重回帰分析
+    multipleRegressionAnalysis(input){
+      let xsum = 0; /* 測定値xの総和を格納する変数xsumを宣言 */
+      let ysum = 0; /* 測定値yの総和を格納する変数ysumを宣言 */
+      let zsum = 0; /* 測定値zの総和を格納する変数zsumを宣言 */
+      let wsum = 0; /* 測定値wの総和を格納する変数wsumを宣言 */
+      let xave = 0; /* 測定値xの平均を格納する変数xaveを宣言 */
+      let yave = 0; /* 測定値yの平均を格納する変数yaveを宣言 */
+      let zave = 0; /* 測定値zの平均を格納する変数zaveを宣言 */
+      let wave = 0; /* 測定値wの平均を格納する変数waveを宣言 */
+
+      let n = input.length /* データ数 */
+
+      let x = new Array(n); /* n個の測定値を格納する配列xを宣言 */
+      let y = new Array(n); /* n個の測定値を格納する配列yを宣言 */
+      let z = new Array(n); /* n個の測定値を格納する配列zを宣言 */
+      let w = new Array(n); /* n個の測定値を格納する配列wを宣言 */
+      let xd = new Array(n); /* n個のxの残差の二乗を格納する配列xdを宣言 */
+      let yd = new Array(n); /* n個のyの残差の二乗を格納する配列ydを宣言 */
+      let zd = new Array(n); /* n個のzの残差の二乗を格納する配列zdを宣言 */
+      let wd = new Array(n); /* n個のwの残差の二乗を格納する配列wdを宣言 */
+      let xyd = new Array(n); /* n個のxの残差とyの残差との積を格納する配列xydを宣言 */
+      let xzd = new Array(n); /* n個のxの残差とzの残差との積を格納する配列xzdを宣言 */
+      let yzd = new Array(n); /* n個のyの残差とzの残差との積を格納する配列yzdを宣言 */
+      let xwd = new Array(n); /* n個のxの残差とwの残差との積を格納する配列xwdを宣言 */
+      let ywd = new Array(n); /* n個のyの残差とwの残差との積を格納する配列ywdを宣言 */
+      let zwd = new Array(n); /* n個のzの残差とwの残差との積を格納する配列zwdを宣言 */
+
+      let xdsum = 0; /* xの残差の二乗の総和を格納する変数xdsumを宣言 */
+      let ydsum = 0; /* yの残差の二乗の総和を格納する変数ydsumを宣言 */
+      let zdsum = 0; /* zの残差の二乗の総和を格納する変数zdsumを宣言 */
+      let wdsum = 0; /* wの残差の二乗の総和を格納する変数wdsumを宣言 */
+      let xydsum = 0; /* xの残差とyの残差との積の総和を格納する変数xydsumを宣言 */
+      let xzdsum = 0; /* xの残差とzの残差との積の総和を格納する変数xzdsumを宣言 */
+      let yzdsum = 0; /* yの残差とzの残差との積の総和を格納する変数yzdsumを宣言 */
+      let xwdsum = 0; /* xの残差とwの残差との積の総和を格納する変数xwdsumを宣言 */
+      let ywdsum = 0; /* yの残差とwの残差との積の総和を格納する変数ywdsumを宣言 */
+      let zwdsum = 0; /* zの残差とwの残差との積の総和を格納する変数zwdsumを宣言 */
+
+      let sx2 = 0; // xの分散
+      let sy2 = 0; // yの分散
+      let sz2 = 0; // zの分散
+      let sw2 = 0; // wの分散
+      let sxy = 0; // xとyの共分散
+      let sxz = 0; // xとzの共分散
+      let syz = 0; // yとzの共分散
+      let sxw = 0; // xとwの共分散
+      let syw = 0; // yとwの共分散
+      let szw = 0; // zとwの共分散
+      let rxy = 0; // xとyの相関係数
+      let rxz = 0; // xとzの相関係数
+      let ryz = 0; // yとzの相関係数
+      let rxw = 0; // xとwの相関係数
+      let ryw = 0; // yとwの相関係数
+      let rzw = 0; // zとwの相関係数
+
+      let i;
+      let eachdata;
+      let det0, det1, det2, det3;
+      let a, b, c, d;
+
+      for(i = 0; i < n; ++i){
+        eachdata = input[i];
+
+        x[i] = parseFloat(eachdata[0]);
+        y[i] = parseFloat(eachdata[1]);
+        z[i] = parseFloat(eachdata[2]);
+        w[i] = parseFloat(eachdata[3]);
+
+        xsum = xsum + x[i];
+        ysum = ysum + y[i];
+        zsum = zsum + z[i];
+        wsum = wsum + w[i];
+      }
+
+      xave = xsum / n;
+      yave = ysum / n;
+      zave = zsum / n;
+      wave = wsum / n;
+
+      for(i = 0; i < n; ++i){
+        xd[i] = Math.pow((x[i] - xave),2);
+        /* i番目のxの残差の二乗をxd[i]に代入 */
+        yd[i] = Math.pow((y[i] - yave),2);
+        /* i番目のyの残差の二乗をyd[i]に代入 */
+        zd[i] = Math.pow((z[i] - zave),2);
+        /* i番目のzの残差の二乗をzd[i]に代入 */
+        wd[i] = Math.pow((w[i] - wave),2);
+        /* i番目のwの残差の二乗をwd[i]に代入 */
+        xyd[i] = (x[i]-xave)*(y[i] - yave);
+        /* i番目のxの残差とyの残差との積をxyd[i]に代入 */
+        xzd[i] = (x[i] - xave)*(z[i] - zave);
+        /* i番目のxの残差とzの残差との積をxzd[i]に代入 */
+        yzd[i] = (y[i] - yave)*(z[i] - zave);
+        /* i番目のyの残差とzの残差との積をyzd[i]に代入 */
+        xwd[i] = (x[i] - xave)*(w[i] - wave);
+        /* i番目のxの残差とwの残差との積をxwd[i]に代入 */
+        ywd[i] = (y[i] - yave)*(w[i] - wave);
+        /* i番目のyの残差とwの残差との積をywd[i]に代入 */
+        zwd[i] = (z[i] - zave)*(w[i] - wave);
+        /* i番目のzの残差とwの残差との積をzwd[i]に代入 */
+
+        xdsum = xdsum + xd[i];
+        ydsum = ydsum + yd[i];
+        zdsum = zdsum + zd[i];
+        wdsum = wdsum + wd[i];
+        xydsum = xydsum + xyd[i];
+        xzdsum = xzdsum + xzd[i];
+        yzdsum = yzdsum + yzd[i];
+        xwdsum = xwdsum + xwd[i];
+        ywdsum = ywdsum + ywd[i];
+        zwdsum = zwdsum + zwd[i];
+      }
+
+      sx2 = xdsum / n;
+      sy2 = ydsum / n;
+      sz2 = zdsum / n;
+      sw2 = wdsum / n;
+      sxy = xydsum / n;
+      sxz = xzdsum / n;
+      syz = yzdsum / n;
+      sxw = xwdsum / n;
+      syw = ywdsum / n;
+      szw = zwdsum / n;
+
+      det0 = sx2*(sy2*sz2-syz*syz)+sxy*(syz*sxz-sxy*sz2)+sxz*(sxy*syz-sy2*sxz);
+      det1 = sxw*(sy2*sz2-syz*syz)+sxy*(syz*szw-syw*sz2)+sxz*(syw*syz-sy2*szw);
+      det2 = sx2*(syw*sz2-syz*szw)+sxw*(syz*sxz-sxy*sz2)+sxz*(sxy*szw-syw*sxz);
+      det3 = sx2*(sy2*szw-syw*syz)+sxy*(syw*sxz-sxy*szw)+sxw*(sxy*syz-sy2*sxz);
+
+      a = det1 / det0;
+      b = det2 / det0;
+      c = det3 / det0;
+      d = wave - (a*xave + b*yave + c*zave);
+      rxy = sxy/(Math.sqrt(sx2*sy2));
+      rxz = sxz/(Math.sqrt(sx2*sz2));
+      ryz = syz/(Math.sqrt(sy2*sz2));
+      rxw = sxw/(Math.sqrt(sx2*sw2));
+      ryw = syw/(Math.sqrt(sy2*sw2));
+      rzw = szw/(Math.sqrt(sz2*sw2));
+
+      const value = [a, b, c, d];
+
+      return value
+
     },
     calcLen(a, b){
       return Math.sqrt(Math.pow( a[0]-b[0], 2 ) + Math.pow( a[1]-b[1], 2 ) + Math.pow( a[2]-b[2], 2 ))
+    },
+    hsv2rgb(input){
+      let h = input[0] / 60;
+      let s = input[1] / 100;
+      let v = input[2] / 100;
+
+      let r, g, b;
+
+      if (s == 0) {
+        r = v * 255;
+        g = v * 255;
+        b = v * 255;
+      } else {
+        let rgb;
+        let i = parseInt(h);
+        let f = h - i;
+        let v1 = v * (1 - s);
+        let v2 = v * (1 - s * f);
+        let v3 = v * (1 - s * (1 - f));
+
+        switch (i) {
+          case 0:
+          case 6:
+            rgb = [v, v3, v1];
+            break;
+
+          case 1:
+            rgb = [v2, v, v1];
+            break;
+
+          case 2:
+            rgb = [v1, v, v3];
+            break;
+
+          case 3:
+            rgb = [v1, v2, v];
+            break;
+
+          case 4:
+            rgb = [v3, v1, v];
+            break;
+
+          case 5:
+            rgb = [v, v1, v2];
+            break;
+
+          default:
+            rgb = [0, 0, 0];
+            break;
+        }
+
+        r = Math.round(rgb[0] * 255);
+        g = Math.round(rgb[1] * 255);
+        b = Math.round(rgb[2] * 255);
+      }
+      
+      const value = [r, g, b];
+        
+      return value
+
     },
     hex2rgb(input) {
       const hex = input.split("");
