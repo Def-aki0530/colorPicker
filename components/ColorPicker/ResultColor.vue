@@ -86,7 +86,7 @@ export default {
 
 <style scoped lang="scss">
 .result-color {
-  width: 30%;
+  width: 32%;
   height: auto;
 }
 
