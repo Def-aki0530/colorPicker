@@ -243,7 +243,7 @@ export default {
 
         const ssMaterial = this.multipleRegressionAnalysis(shadowS);
         this.colorValue[i].hsvShadowColor[1] = parseInt((ssMaterial[0]*baseH) + (ssMaterial[1]*baseS) + (ssMaterial[2]*baseV) + ssMaterial[3]);
-        if((this.colorValue[i].hsvShadowColor[1] < 0)||(this.colorValue[i].hsvShadowColor[1] > 100)){
+        if((this.colorValue[i].hsvShadowColor[1] < 0)||(this.colorValue[i].hsvShadowColor[1] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[1]) === false)){
           this.colorValue[i].hsvShadowColor[1] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[1][0]][4]) + Number(res.data[this.colorValue[i].nearColor[2][0]][4])) / 5);
           console.log("no data shadowS " + i);
         }
@@ -259,7 +259,7 @@ export default {
 
         const svMaterial = this.multipleRegressionAnalysis(shadowV);
         this.colorValue[i].hsvShadowColor[2] = parseInt((svMaterial[0]*baseH) + (svMaterial[1]*baseS) + (svMaterial[2]*baseV) + svMaterial[3]);
-        if((this.colorValue[i].hsvShadowColor[2] < 0)||(this.colorValue[i].hsvShadowColor[2] > 100)){
+        if((this.colorValue[i].hsvShadowColor[2] < 0)||(this.colorValue[i].hsvShadowColor[2] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[2]) === false)){
           this.colorValue[i].hsvShadowColor[2] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[1][0]][5]) + Number(res.data[this.colorValue[i].nearColor[2][0]][5])) / 5);
           console.log("no data shadowV " + i)
         }
@@ -430,9 +430,9 @@ export default {
       let r, g, b;
 
       if (s == 0) {
-        r = v * 255;
-        g = v * 255;
-        b = v * 255;
+        r = Math.round(v * 255);
+        g = Math.round(v * 255);
+        b = Math.round(v * 255);
       } else {
         let rgb;
         let i = parseInt(h);
