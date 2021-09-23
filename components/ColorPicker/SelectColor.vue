@@ -53,10 +53,10 @@
           <ColorPickerResultColor
             :colorSpace="colorSpace"
             :label="'ハイライト'"
-            :hexResultColor="i.hexHilightColor"
-            :rgbResultColor="i.rgbHilightColor"
-            :hsvResultColor="i.hsvHilightColor"
-            :hslResultColor="i.hslHilightColor"
+            :hexResultColor="i.hexHighlightColor"
+            :rgbResultColor="i.rgbHighlightColor"
+            :hsvResultColor="i.hsvHighlightColor"
+            :hslResultColor="i.hslHighlightColor"
           />
         </div>
       </ColorPickerArea>
@@ -103,19 +103,10 @@ export default {
           rgbShadowColor: [255, 255, 255],
           hsvShadowColor: [0, 0, 100],
           hslShadowColor: [0, 0, 100],
-          hexHilightColor: "#ffffff",
-          rgbHilightColor: [255, 255, 255],
-          hsvHilightColor: [0, 0, 100],
-          hslHilightColor: [0, 0, 100],
-          nearColor:[
-            [0, 360],
-            [0, 360],
-            [0, 360],
-            [0, 360],
-            [0, 360],
-            [0, 360]
-          ],
-          inputNearColor: [0, 255],
+          hexHighlightColor: "#ffffff",
+          rgbHighlightColor: [255, 255, 255],
+          hsvHighlightColor: [0, 0, 100],
+          hslHighlightColor: [0, 0, 100]
         },
       ],
     };
@@ -143,130 +134,223 @@ export default {
         rgbShadowColor: [255, 255, 255],
         hsvShadowColor: [0, 0, 100],
         hslShadowColor: [0, 0, 100],
-        hexHilightColor: "#ffffff",
-        rgbHilightColor: [255, 255, 255],
-        hsvHilightColor: [0, 0, 100],
-        hslHilightColor: [0, 0, 100],
-        nearColor:[
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360]
-        ],
-        inputNearColor: [0, 360],
+        hexHighlightColor: "#ffffff",
+        rgbHighlightColor: [255, 255, 255],
+        hsvHighlightColor: [0, 0, 100],
+        hslHighlightColor: [0, 0, 100],
       });
     },
     async createColor(){
-      //colorPatternのCSVファイルの読み込み
-      const fileName = "color" + this.colorPattern + ".csv";
-      const res = await fetch("./data/" + fileName).then(data => data.text()).then(v => Papa.parse(v));
+      // colorPatternのCSVファイルの読み込み
+      const colorFileName = "color" + this.colorPattern + ".csv";
+      const color = await fetch("./data/" + colorFileName).then(data => data.text()).then(v => Papa.parse(v));
+
+      const highlightFileName = "highlight" + this.colorPattern + ".csv";
+      const highlight = await fetch("./data/" + highlightFileName).then(data => data.text()).then(v => Papa.parse(v));
 
       let rgbInputColor = [];
       let hsvInputColor = []; 
       let csvBaseColor = [];
+
       let len;
       let i, j, k, l;
+      let tmp1, tmp2;
+
       let baseH, baseS, baseV;
 
+      let shadowH;
+      let shadowS = [];
+      let shadowV = [];
+
+      let highlightH;
+      let highlightS = [];
+      let highlightV = [];
+
+      let inputNearColor = [0, 360];
+      let nearColor = [
+        [0, 360],
+        [0, 360],
+        [0, 360],
+        [0, 360],
+        [0, 360],
+        [0, 360]
+      ];
+
       for(i = 0; i < this.colorValue.length; i++){
-        //inputNearColorの初期化
-        this.colorValue[i].inputNearColor = [0, 360];
-        //inputColorに最も近い色の取得
+        // 基本色
+        // inputNearColorの初期化
+        inputNearColor = [0, 360];
+        // inputColorに最も近い色の取得
         rgbInputColor = this.hex2rgb(this.colorValue[i].inputColor);
         hsvInputColor = this.rgb2hsv(rgbInputColor);
-        for(j = 1; j < res.data.length; j++){
-          csvBaseColor = [res.data[j][0], res.data[j][1], res.data[j][2]];
+        for(j = 1; j < color.data.length; j++){
+          csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
           len = this.calcLen(hsvInputColor, csvBaseColor);
-          if(len < this.colorValue[i].inputNearColor[1]){
-            this.colorValue[i].inputNearColor[0] = j;
-            this.colorValue[i].inputNearColor[1] = len;
+          if(len < inputNearColor[1]){
+            inputNearColor[0] = j;
+            inputNearColor[1] = len;
           }
         }
-        //nearColorの初期化
-        this.colorValue[i].nearColor = [
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360],
-          [0, 360]
-        ];
 
-        //baseColorの生成
-        baseH = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][0]) + hsvInputColor[0]) / 2);
-        baseS = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][1]) + hsvInputColor[1]) / 2);
-        baseV = parseInt((Number(res.data[this.colorValue[i].inputNearColor[0]][2]) + hsvInputColor[2]) / 2);
+        // baseColorの決定
+        baseH = parseInt((Number(color.data[inputNearColor[0]][0]) + hsvInputColor[0]) / 2);
+        baseS = parseInt((Number(color.data[inputNearColor[0]][1]) + hsvInputColor[1]) / 2);
+        baseV = parseInt((Number(color.data[inputNearColor[0]][2]) + hsvInputColor[2]) / 2);
 
         this.colorValue[i].hsvBaseColor = [baseH, baseS, baseV];
         this.colorValue[i].rgbBaseColor = this.hsv2rgb(this.colorValue[i].hsvBaseColor);
         this.colorValue[i].hexBaseColor = this.rgb2hex(this.colorValue[i].rgbBaseColor);
         this.colorValue[i].hslBaseColor = this.rgb2hsl(this.colorValue[i].rgbBaseColor);
 
-        //baseColorに近い色を5個取得
-        for(j = 1; j < res.data.length; j++){
-          csvBaseColor = [res.data[j][0], res.data[j][1], res.data[j][2]];
+        // 影色
+        // nearColorの初期化
+        nearColor = [
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360]
+        ];
+
+        // baseColorに近い色を5個取得
+        for(j = 1; j < color.data.length; j++){
+          csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
           len = this.calcLen(this.colorValue[i].hsvBaseColor, csvBaseColor);
-          if(len < this.colorValue[i].nearColor[5][1]){
-            this.colorValue[i].nearColor[5][0] = j;
-            this.colorValue[i].nearColor[5][1] = len;
+          if(len < nearColor[5][1]){
+            nearColor[5][0] = j;
+            nearColor[5][1] = len;
 
             // バブルソート
-            for(k = 0; k < this.colorValue[i].nearColor.length; k++){
-              for(l = this.colorValue[i].nearColor.length-1; l > k ; l--){
-                if(this.colorValue[i].nearColor[l][1] < this.colorValue[i].nearColor[l-1][1]){
-                  let tmp1 = this.colorValue[i].nearColor[l][0];
-                  let tmp2 = this.colorValue[i].nearColor[l][1];
-                  this.colorValue[i].nearColor[l][0] = this.colorValue[i].nearColor[l-1][0];
-                  this.colorValue[i].nearColor[l][1] = this.colorValue[i].nearColor[l-1][1];
-                  this.colorValue[i].nearColor[l-1][0] =tmp1;
-                  this.colorValue[i].nearColor[l-1][1] =tmp2;
+            for(k = 0; k < nearColor.length; k++){
+              for(l = nearColor.length-1; l > k ; l--){
+                if(nearColor[l][1] < nearColor[l-1][1]){
+                  tmp1 = nearColor[l][0];
+                  tmp2 = nearColor[l][1];
+                  nearColor[l][0] = nearColor[l-1][0];
+                  nearColor[l][1] = nearColor[l-1][1];
+                  nearColor[l-1][0] =tmp1;
+                  nearColor[l-1][1] =tmp2;
                 }
               }
             }
           }
         }
 
-        //影色Hの算出
-        const shadowH = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[0][0]][3]) + Number(res.data[this.colorValue[i].nearColor[1][0]][3]) + Number(res.data[this.colorValue[i].nearColor[2][0]][3])) / 5);
+        // 影色Hの決定
+        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[1][0]][3]) + Number(color.data[nearColor[2][0]][3])) / 5);
         this.colorValue[i].hsvShadowColor[0] = shadowH;
 
-        //影色Sの算出
-        const shadowS = [
-          [res.data[this.colorValue[i].nearColor[0][0]][0], res.data[this.colorValue[i].nearColor[0][0]][1], res.data[this.colorValue[i].nearColor[0][0]][2], res.data[this.colorValue[i].nearColor[0][0]][4]],
-          [res.data[this.colorValue[i].nearColor[1][0]][0], res.data[this.colorValue[i].nearColor[1][0]][1], res.data[this.colorValue[i].nearColor[1][0]][2], res.data[this.colorValue[i].nearColor[1][0]][4]],
-          [res.data[this.colorValue[i].nearColor[2][0]][0], res.data[this.colorValue[i].nearColor[2][0]][1], res.data[this.colorValue[i].nearColor[2][0]][2], res.data[this.colorValue[i].nearColor[2][0]][4]],
-          [res.data[this.colorValue[i].nearColor[3][0]][0], res.data[this.colorValue[i].nearColor[3][0]][1], res.data[this.colorValue[i].nearColor[3][0]][2], res.data[this.colorValue[i].nearColor[3][0]][4]],
-          [res.data[this.colorValue[i].nearColor[4][0]][0], res.data[this.colorValue[i].nearColor[4][0]][1], res.data[this.colorValue[i].nearColor[4][0]][2], res.data[this.colorValue[i].nearColor[4][0]][4]]
+        // 影色Sの決定
+        shadowS = [
+          [color.data[nearColor[0][0]][0], color.data[nearColor[0][0]][1], color.data[nearColor[0][0]][2], color.data[nearColor[0][0]][4]],
+          [color.data[nearColor[1][0]][0], color.data[nearColor[1][0]][1], color.data[nearColor[1][0]][2], color.data[nearColor[1][0]][4]],
+          [color.data[nearColor[2][0]][0], color.data[nearColor[2][0]][1], color.data[nearColor[2][0]][2], color.data[nearColor[2][0]][4]],
+          [color.data[nearColor[3][0]][0], color.data[nearColor[3][0]][1], color.data[nearColor[3][0]][2], color.data[nearColor[3][0]][4]],
+          [color.data[nearColor[4][0]][0], color.data[nearColor[4][0]][1], color.data[nearColor[4][0]][2], color.data[nearColor[4][0]][4]]
         ];
 
         const ssMaterial = this.multipleRegressionAnalysis(shadowS);
         this.colorValue[i].hsvShadowColor[1] = parseInt((ssMaterial[0]*baseH) + (ssMaterial[1]*baseS) + (ssMaterial[2]*baseV) + ssMaterial[3]);
         if((this.colorValue[i].hsvShadowColor[1] < 0)||(this.colorValue[i].hsvShadowColor[1] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[1]) === false)){
-          this.colorValue[i].hsvShadowColor[1] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[0][0]][4]) + Number(res.data[this.colorValue[i].nearColor[1][0]][4]) + Number(res.data[this.colorValue[i].nearColor[2][0]][4])) / 5);
+          this.colorValue[i].hsvShadowColor[1] = Math.round((Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[1][0]][4]) + Number(color.data[nearColor[2][0]][4])) / 5);
           console.log("no data shadowS " + i);
         }
 
-        //影色Vの算出
-        const shadowV = [
-          [res.data[this.colorValue[i].nearColor[0][0]][0], res.data[this.colorValue[i].nearColor[0][0]][1], res.data[this.colorValue[i].nearColor[0][0]][2], res.data[this.colorValue[i].nearColor[0][0]][5]],
-          [res.data[this.colorValue[i].nearColor[1][0]][0], res.data[this.colorValue[i].nearColor[1][0]][1], res.data[this.colorValue[i].nearColor[1][0]][2], res.data[this.colorValue[i].nearColor[1][0]][5]],
-          [res.data[this.colorValue[i].nearColor[2][0]][0], res.data[this.colorValue[i].nearColor[2][0]][1], res.data[this.colorValue[i].nearColor[2][0]][2], res.data[this.colorValue[i].nearColor[2][0]][5]],
-          [res.data[this.colorValue[i].nearColor[3][0]][0], res.data[this.colorValue[i].nearColor[3][0]][1], res.data[this.colorValue[i].nearColor[3][0]][2], res.data[this.colorValue[i].nearColor[3][0]][5]],
-          [res.data[this.colorValue[i].nearColor[4][0]][0], res.data[this.colorValue[i].nearColor[4][0]][1], res.data[this.colorValue[i].nearColor[4][0]][2], res.data[this.colorValue[i].nearColor[4][0]][5]]
+        // 影色Vの決定
+        shadowV = [
+          [color.data[nearColor[0][0]][0], color.data[nearColor[0][0]][1], color.data[nearColor[0][0]][2], color.data[nearColor[0][0]][5]],
+          [color.data[nearColor[1][0]][0], color.data[nearColor[1][0]][1], color.data[nearColor[1][0]][2], color.data[nearColor[1][0]][5]],
+          [color.data[nearColor[2][0]][0], color.data[nearColor[2][0]][1], color.data[nearColor[2][0]][2], color.data[nearColor[2][0]][5]],
+          [color.data[nearColor[3][0]][0], color.data[nearColor[3][0]][1], color.data[nearColor[3][0]][2], color.data[nearColor[3][0]][5]],
+          [color.data[nearColor[4][0]][0], color.data[nearColor[4][0]][1], color.data[nearColor[4][0]][2], color.data[nearColor[4][0]][5]]
         ];
 
         const svMaterial = this.multipleRegressionAnalysis(shadowV);
         this.colorValue[i].hsvShadowColor[2] = parseInt((svMaterial[0]*baseH) + (svMaterial[1]*baseS) + (svMaterial[2]*baseV) + svMaterial[3]);
         if((this.colorValue[i].hsvShadowColor[2] < 0)||(this.colorValue[i].hsvShadowColor[2] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[2]) === false)){
-          this.colorValue[i].hsvShadowColor[2] = Math.round((Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[0][0]][5]) + Number(res.data[this.colorValue[i].nearColor[1][0]][5]) + Number(res.data[this.colorValue[i].nearColor[2][0]][5])) / 5);
+          this.colorValue[i].hsvShadowColor[2] = Math.round((Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[1][0]][5]) + Number(color.data[nearColor[2][0]][5])) / 5);
           console.log("no data shadowV " + i)
         }
 
         this.colorValue[i].rgbShadowColor = this.hsv2rgb(this.colorValue[i].hsvShadowColor);
         this.colorValue[i].hexShadowColor = this.rgb2hex(this.colorValue[i].rgbShadowColor);
         this.colorValue[i].hslShadowColor = this.rgb2hsl(this.colorValue[i].rgbShadowColor);
+
+        // ハイライト
+        // nearColorの初期化
+        nearColor = [
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360],
+          [0, 360]
+        ];
+
+        // baseColorに近い色を5個取得
+        for(j = 1; j < highlight.data.length; j++){
+          csvBaseColor = [highlight.data[j][0], highlight.data[j][1], highlight.data[j][2]];
+          len = this.calcLen(this.colorValue[i].hsvBaseColor, csvBaseColor);
+          if(len < nearColor[5][1]){
+            nearColor[5][0] = j;
+            nearColor[5][1] = len;
+
+            // バブルソート
+            for(k = 0; k < nearColor.length; k++){
+              for(l = nearColor.length-1; l > k ; l--){
+                if(nearColor[l][1] < nearColor[l-1][1]){
+                  tmp1 = nearColor[l][0];
+                  tmp2 = nearColor[l][1];
+                  nearColor[l][0] = nearColor[l-1][0];
+                  nearColor[l][1] = nearColor[l-1][1];
+                  nearColor[l-1][0] =tmp1;
+                  nearColor[l-1][1] =tmp2;
+                }
+              }
+            }
+          }
+        }
+
+        // ハイライトHの決定
+        highlightH = Math.round((Number(highlight.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0])/2);
+        this.colorValue[i].hsvHighlightColor[0] = highlightH;
+
+        // ハイライトSの決定
+        highlightS = [
+          [highlight.data[nearColor[0][0]][0], highlight.data[nearColor[0][0]][1], highlight.data[nearColor[0][0]][2], highlight.data[nearColor[0][0]][4]],
+          [highlight.data[nearColor[1][0]][0], highlight.data[nearColor[1][0]][1], highlight.data[nearColor[1][0]][2], highlight.data[nearColor[1][0]][4]],
+          [highlight.data[nearColor[2][0]][0], highlight.data[nearColor[2][0]][1], highlight.data[nearColor[2][0]][2], highlight.data[nearColor[2][0]][4]],
+          [highlight.data[nearColor[3][0]][0], highlight.data[nearColor[3][0]][1], highlight.data[nearColor[3][0]][2], highlight.data[nearColor[3][0]][4]],
+          [highlight.data[nearColor[4][0]][0], highlight.data[nearColor[4][0]][1], highlight.data[nearColor[4][0]][2], highlight.data[nearColor[4][0]][4]]
+        ];
+
+        const hsMaterial = this.multipleRegressionAnalysis(highlightS);
+        this.colorValue[i].hsvHighlightColor[1] = parseInt((hsMaterial[0]*baseH) + (hsMaterial[1]*baseS) + (hsMaterial[2]*baseV) + hsMaterial[3]);
+        if((this.colorValue[i].hsvHighlightColor[1] < 0)||(this.colorValue[i].hsvHighlightColor[1] > 100)||(isFinite(this.colorValue[i].hsvHighlightColor[1]) === false)){
+          this.colorValue[i].hsvHighlightColor[1] = Math.round((Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[1][0]][4]) + Number(highlight.data[nearColor[2][0]][4])) / 5);
+          console.log("no data highlightS " + i);
+        }
+
+        // ハイライトVの決定
+        highlightV = [
+          [highlight.data[nearColor[0][0]][0], highlight.data[nearColor[0][0]][1], highlight.data[nearColor[0][0]][2], highlight.data[nearColor[0][0]][5]],
+          [highlight.data[nearColor[1][0]][0], highlight.data[nearColor[1][0]][1], highlight.data[nearColor[1][0]][2], highlight.data[nearColor[1][0]][5]],
+          [highlight.data[nearColor[2][0]][0], highlight.data[nearColor[2][0]][1], highlight.data[nearColor[2][0]][2], highlight.data[nearColor[2][0]][5]],
+          [highlight.data[nearColor[3][0]][0], highlight.data[nearColor[3][0]][1], highlight.data[nearColor[3][0]][2], highlight.data[nearColor[3][0]][5]],
+          [highlight.data[nearColor[4][0]][0], highlight.data[nearColor[4][0]][1], highlight.data[nearColor[4][0]][2], highlight.data[nearColor[4][0]][5]]
+        ];
+
+        const hvMaterial = this.multipleRegressionAnalysis(highlightV);
+        this.colorValue[i].hsvHighlightColor[2] = parseInt((hvMaterial[0]*baseH) + (hvMaterial[1]*baseS) + (hvMaterial[2]*baseV) + hvMaterial[3]);
+        if((this.colorValue[i].hsvHighlightColor[2] < 0)||(this.colorValue[i].hsvHighlightColor[2] > 100)||(isFinite(this.colorValue[i].hsvHighlightColor[2]) === false)){
+          this.colorValue[i].hsvHighlightColor[2] = Math.round((Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[1][0]][5]) + Number(highlight.data[nearColor[2][0]][5])) / 5);
+          console.log("no data highlightV " + i)
+        }
+
+        this.colorValue[i].rgbHighlightColor = this.hsv2rgb(this.colorValue[i].hsvHighlightColor);
+        this.colorValue[i].hexHighlightColor = this.rgb2hex(this.colorValue[i].rgbHighlightColor);
+        this.colorValue[i].hslHighlightColor = this.rgb2hsl(this.colorValue[i].rgbHighlightColor);
 
       }
     },
