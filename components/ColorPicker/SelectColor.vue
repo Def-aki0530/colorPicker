@@ -238,7 +238,7 @@ export default {
         }
 
         // 影色Hの決定
-        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[1][0]][3]) + Number(color.data[nearColor[2][0]][3])) / 5);
+        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0]) / 2);
         this.colorValue[i].hsvShadowColor[0] = shadowH;
 
         // 影色Sの決定
