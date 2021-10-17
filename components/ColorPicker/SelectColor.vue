@@ -185,7 +185,7 @@ export default {
         hsvInputColor = this.rgb2hsv(rgbInputColor);
         for(j = 1; j < color.data.length; j++){
           csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
-          len = this.calcLen(hsvInputColor, csvBaseColor);
+          len = this.calcLen3d(hsvInputColor, csvBaseColor);
           if(len < inputNearColor[1]){
             inputNearColor[0] = j;
             inputNearColor[1] = len;
@@ -216,7 +216,7 @@ export default {
         // baseColorに近い色を5個取得
         for(j = 1; j < color.data.length; j++){
           csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
-          len = this.calcLen(this.colorValue[i].hsvBaseColor, csvBaseColor);
+          len = this.calcLen3d(this.colorValue[i].hsvBaseColor, csvBaseColor);
           if(len < nearColor[5][1]){
             nearColor[5][0] = j;
             nearColor[5][1] = len;
@@ -238,7 +238,17 @@ export default {
         }
 
         // 影色Hの決定
-        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0]) / 2);
+        let shadowHData = [
+          color.data[nearColor[0][0]][3],
+          color.data[nearColor[1][0]][3],
+          color.data[nearColor[2][0]][3],
+          color.data[nearColor[3][0]][3],
+          color.data[nearColor[4][0]][3],
+        ];
+
+        this.clustering(shadowHData);
+        
+        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0]) / 4);
         this.colorValue[i].hsvShadowColor[0] = shadowH;
 
         // 影色Sの決定
@@ -291,7 +301,7 @@ export default {
         // baseColorに近い色を5個取得
         for(j = 1; j < highlight.data.length; j++){
           csvBaseColor = [highlight.data[j][0], highlight.data[j][1], highlight.data[j][2]];
-          len = this.calcLen(this.colorValue[i].hsvBaseColor, csvBaseColor);
+          len = this.calcLen3d(this.colorValue[i].hsvBaseColor, csvBaseColor);
           if(len < nearColor[5][1]){
             nearColor[5][0] = j;
             nearColor[5][1] = len;
@@ -345,7 +355,7 @@ export default {
         this.colorValue[i].hsvHighlightColor[2] = parseInt((hvMaterial[0]*baseH) + (hvMaterial[1]*baseS) + (hvMaterial[2]*baseV) + hvMaterial[3]);
         if((this.colorValue[i].hsvHighlightColor[2] < 0)||(this.colorValue[i].hsvHighlightColor[2] > 100)||(isFinite(this.colorValue[i].hsvHighlightColor[2]) === false)){
           this.colorValue[i].hsvHighlightColor[2] = Math.round((Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[1][0]][5]) + Number(highlight.data[nearColor[2][0]][5])) / 5);
-          console.log("no data highlightV " + i)
+          console.log("no data highlightV " + i);
         }
 
         this.colorValue[i].rgbHighlightColor = this.hsv2rgb(this.colorValue[i].hsvHighlightColor);
@@ -356,6 +366,7 @@ export default {
     },
     resetColor(){
       console.log("move reset");
+      this.colorValue = [];
     },
     //重回帰分析
     multipleRegressionAnalysis(input){
@@ -368,7 +379,7 @@ export default {
       let zave = 0; /* 測定値zの平均を格納する変数zaveを宣言 */
       let wave = 0; /* 測定値wの平均を格納する変数waveを宣言 */
 
-      let n = input.length /* データ数 */
+      let n = input.length; /* データ数 */
 
       let x = new Array(n); /* n個の測定値を格納する配列xを宣言 */
       let y = new Array(n); /* n個の測定値を格納する配列yを宣言 */
@@ -503,8 +514,125 @@ export default {
       return value
 
     },
-    calcLen(a, b){
+    //クラスタリング　最短距離法　色相決定
+    clustering(h){
+      const x = 0; //原点x
+      const y = 0; //原点y
+      const r = 100; //半径(長さ)
+
+      let i, j, k, l;
+      let coordinate = [];
+      let clusterNum = [];
+
+      //色相のHを角度とする円座標に変換する
+      for(i = 0; i < h.length; i++){
+        coordinate.push([x + r * Math.cos(h[i] * (Math.PI / 180)), y + r * Math.sin(h[i] * (Math.PI / 180))]);
+        clusterNum.push(i);
+      }
+
+      let clusterNumEnd = clusterNum.length;
+      let clusterNumSize = clusterNum.length;
+      let clusterSizeCheck = clusterNum.length - 1;
+      let cluster = []; // 要素1, 要素2, 要素間距離, クラスタの構成要素1, クラスタの構成要素2, クラスタの構成要素n
+
+      let len;
+      let lenTmp;
+      let minLen = 200;
+      let clusterNumTmp1; //追加クラスタのクラスタ番号を保管しておく一時的な変数
+      let clusterNumTmp2; //追加クラスタのクラスタ番号を保管しておく一時的な変数
+
+      //クラスタリング
+      while(clusterNum.length > 1){
+        //minLenの初期化
+        minLen = 200;
+
+        for(i = 0; i < clusterNum.length; i++){
+          for(j = i + 1; j < clusterNum.length; j++){
+            if((clusterNum[i] > clusterSizeCheck) && (clusterNum[j] > clusterSizeCheck)){
+              len = 200;
+              for(k = 3; k < cluster[clusterNum[i]-clusterNumSize].length; k++){
+                for(l = 3; l < cluster[clusterNum[j]-clusterNumSize].length; l++){
+                  lenTmp = this.calcLen2d(coordinate[cluster[clusterNum[i]-clusterNumSize][k]], coordinate[cluster[clusterNum[j]-clusterNumSize][l]]);
+                  if(lenTmp < len){
+                    len = lenTmp;
+                  }
+                }
+              }
+
+            }else if(clusterNum[j] > clusterSizeCheck){
+              len = 200;
+              for(k = 3; k < cluster[clusterNum[j]-clusterNumSize].length; k++){
+                lenTmp = this.calcLen2d(coordinate[clusterNum[i]], coordinate[cluster[clusterNum[j]-clusterNumSize][k]]);
+                if(lenTmp < len){
+                  len = lenTmp;
+                }
+              }
+
+            }else{
+              len = this.calcLen2d(coordinate[clusterNum[i]], coordinate[clusterNum[j]]);
+
+            }
+
+            if(len < minLen){
+              minLen = len;
+              clusterNumTmp1 = clusterNum[i];
+              clusterNumTmp2 = clusterNum[j];
+
+            }
+          }
+        }
+
+        if((clusterNumTmp1 > clusterSizeCheck) && (clusterNumTmp2 > clusterSizeCheck)){
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen]);
+          for(i = 3; i < cluster[clusterNumTmp1-clusterNumSize].length; i++){
+            cluster[cluster.length-1].push(cluster[clusterNumTmp1-clusterNumSize][i]);
+          }
+          for(i = 3; i < cluster[clusterNumTmp2-clusterNumSize].length; i++){
+            cluster[cluster.length-1].push(cluster[clusterNumTmp2-clusterNumSize][i]);
+          }
+
+        }else if(clusterNumTmp2 > clusterSizeCheck){
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterNumTmp1]);
+          for(i = 3; i < cluster[clusterNumTmp2-clusterNumSize].length; i++){
+            cluster[cluster.length-1].push(cluster[clusterNumTmp2-clusterNumSize][i]);
+          }
+        
+        }else{
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterNumTmp1, clusterNumTmp2]);
+          
+        }
+        clusterNum = this.arrayElemDel(clusterNum, clusterNumTmp1, clusterNumTmp2);
+  
+        clusterNum.push(clusterNumEnd);
+        clusterNumEnd++;
+
+      }
+
+      for(i = 0; i < cluster.length; i++){
+        console.log("elem:" + cluster[i][0] + " " + cluster[i][1]);
+        console.log("len:" + cluster[i][2]);
+        for(j = 3; j < cluster[i].length; j++){
+          console.log(cluster[i][j]);
+        }
+        console.log("------------");
+      }
+
+
+    },
+    calcLen3d(a, b){
       return Math.sqrt(Math.pow( a[0]-b[0], 2 ) + Math.pow( a[1]-b[1], 2 ) + Math.pow( a[2]-b[2], 2 ))
+
+    },
+    calcLen2d(a, b){
+      return Math.sqrt(Math.pow( a[0]-b[0], 2 ) + Math.pow( a[1]-b[1], 2 ))
+
+    },
+    arrayElemDel(array, a, b){
+      let tmp1 = array.filter(item => item !== a);
+      let tmp2 = tmp1.filter(item => item !== b);
+
+      return tmp2;
+
     },
     hsv2rgb(input){
       let h = input[0] / 60;
