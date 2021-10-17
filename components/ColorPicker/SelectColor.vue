@@ -44,7 +44,7 @@
           />
           <ColorPickerResultColor
             :colorSpace="colorSpace"
-            :label="'影色'" 
+            :label="'影色'"
             :hexResultColor="i.hexShadowColor"
             :rgbResultColor="i.rgbShadowColor"
             :hsvResultColor="i.hsvShadowColor"
@@ -67,12 +67,11 @@
 </template>
 
 <script>
-import Papa from 'papaparse'
+import Papa from "papaparse";
 
 export default {
   data() {
     return {
-
       colorValueId: 0,
       colorPattern: "1",
       colorSpace: "1",
@@ -106,7 +105,7 @@ export default {
           hexHighlightColor: "#ffffff",
           rgbHighlightColor: [255, 255, 255],
           hsvHighlightColor: [0, 0, 100],
-          hslHighlightColor: [0, 0, 100]
+          hslHighlightColor: [0, 0, 100],
         },
       ],
     };
@@ -140,16 +139,20 @@ export default {
         hslHighlightColor: [0, 0, 100],
       });
     },
-    async createColor(){
+    async createColor() {
       // colorPatternのCSVファイルの読み込み
       const colorFileName = "color" + this.colorPattern + ".csv";
-      const color = await fetch("./data/" + colorFileName).then(data => data.text()).then(v => Papa.parse(v));
+      const color = await fetch("./data/" + colorFileName)
+        .then((data) => data.text())
+        .then((v) => Papa.parse(v));
 
       const highlightFileName = "highlight" + this.colorPattern + ".csv";
-      const highlight = await fetch("./data/" + highlightFileName).then(data => data.text()).then(v => Papa.parse(v));
+      const highlight = await fetch("./data/" + highlightFileName)
+        .then((data) => data.text())
+        .then((v) => Papa.parse(v));
 
       let rgbInputColor = [];
-      let hsvInputColor = []; 
+      let hsvInputColor = [];
       let csvBaseColor = [];
 
       let len;
@@ -173,34 +176,46 @@ export default {
         [0, 360],
         [0, 360],
         [0, 360],
-        [0, 360]
+        [0, 360],
       ];
 
-      for(i = 0; i < this.colorValue.length; i++){
+      for (i = 0; i < this.colorValue.length; i++) {
         // 基本色
         // inputNearColorの初期化
         inputNearColor = [0, 360];
         // inputColorに最も近い色の取得
         rgbInputColor = this.hex2rgb(this.colorValue[i].inputColor);
         hsvInputColor = this.rgb2hsv(rgbInputColor);
-        for(j = 1; j < color.data.length; j++){
+        for (j = 1; j < color.data.length; j++) {
           csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
           len = this.calcLen3d(hsvInputColor, csvBaseColor);
-          if(len < inputNearColor[1]){
+          if (len < inputNearColor[1]) {
             inputNearColor[0] = j;
             inputNearColor[1] = len;
           }
         }
 
         // baseColorの決定
-        baseH = parseInt((Number(color.data[inputNearColor[0]][0]) + hsvInputColor[0]) / 2);
-        baseS = parseInt((Number(color.data[inputNearColor[0]][1]) + hsvInputColor[1]) / 2);
-        baseV = parseInt((Number(color.data[inputNearColor[0]][2]) + hsvInputColor[2]) / 2);
+        baseH = parseInt(
+          (Number(color.data[inputNearColor[0]][0]) + hsvInputColor[0]) / 2
+        );
+        baseS = parseInt(
+          (Number(color.data[inputNearColor[0]][1]) + hsvInputColor[1]) / 2
+        );
+        baseV = parseInt(
+          (Number(color.data[inputNearColor[0]][2]) + hsvInputColor[2]) / 2
+        );
 
         this.colorValue[i].hsvBaseColor = [baseH, baseS, baseV];
-        this.colorValue[i].rgbBaseColor = this.hsv2rgb(this.colorValue[i].hsvBaseColor);
-        this.colorValue[i].hexBaseColor = this.rgb2hex(this.colorValue[i].rgbBaseColor);
-        this.colorValue[i].hslBaseColor = this.rgb2hsl(this.colorValue[i].rgbBaseColor);
+        this.colorValue[i].rgbBaseColor = this.hsv2rgb(
+          this.colorValue[i].hsvBaseColor
+        );
+        this.colorValue[i].hexBaseColor = this.rgb2hex(
+          this.colorValue[i].rgbBaseColor
+        );
+        this.colorValue[i].hslBaseColor = this.rgb2hsl(
+          this.colorValue[i].rgbBaseColor
+        );
 
         // 影色
         // nearColorの初期化
@@ -210,27 +225,27 @@ export default {
           [0, 360],
           [0, 360],
           [0, 360],
-          [0, 360]
+          [0, 360],
         ];
 
         // baseColorに近い色を5個取得
-        for(j = 1; j < color.data.length; j++){
+        for (j = 1; j < color.data.length; j++) {
           csvBaseColor = [color.data[j][0], color.data[j][1], color.data[j][2]];
           len = this.calcLen3d(this.colorValue[i].hsvBaseColor, csvBaseColor);
-          if(len < nearColor[5][1]){
+          if (len < nearColor[5][1]) {
             nearColor[5][0] = j;
             nearColor[5][1] = len;
 
             // バブルソート
-            for(k = 0; k < nearColor.length; k++){
-              for(l = nearColor.length-1; l > k ; l--){
-                if(nearColor[l][1] < nearColor[l-1][1]){
+            for (k = 0; k < nearColor.length; k++) {
+              for (l = nearColor.length - 1; l > k; l--) {
+                if (nearColor[l][1] < nearColor[l - 1][1]) {
                   tmp1 = nearColor[l][0];
                   tmp2 = nearColor[l][1];
-                  nearColor[l][0] = nearColor[l-1][0];
-                  nearColor[l][1] = nearColor[l-1][1];
-                  nearColor[l-1][0] =tmp1;
-                  nearColor[l-1][1] =tmp2;
+                  nearColor[l][0] = nearColor[l - 1][0];
+                  nearColor[l][1] = nearColor[l - 1][1];
+                  nearColor[l - 1][0] = tmp1;
+                  nearColor[l - 1][1] = tmp2;
                 }
               }
             }
@@ -247,45 +262,139 @@ export default {
         ];
 
         this.clustering(shadowHData);
-        
-        shadowH = Math.round((Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + Number(color.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0]) / 4);
+
+        shadowH = Math.round(
+          (Number(color.data[nearColor[0][0]][3]) +
+            Number(color.data[nearColor[0][0]][3]) +
+            Number(color.data[nearColor[0][0]][3]) +
+            this.colorValue[i].hsvBaseColor[0]) /
+            4
+        );
         this.colorValue[i].hsvShadowColor[0] = shadowH;
 
         // 影色Sの決定
         shadowS = [
-          [color.data[nearColor[0][0]][0], color.data[nearColor[0][0]][1], color.data[nearColor[0][0]][2], color.data[nearColor[0][0]][4]],
-          [color.data[nearColor[1][0]][0], color.data[nearColor[1][0]][1], color.data[nearColor[1][0]][2], color.data[nearColor[1][0]][4]],
-          [color.data[nearColor[2][0]][0], color.data[nearColor[2][0]][1], color.data[nearColor[2][0]][2], color.data[nearColor[2][0]][4]],
-          [color.data[nearColor[3][0]][0], color.data[nearColor[3][0]][1], color.data[nearColor[3][0]][2], color.data[nearColor[3][0]][4]],
-          [color.data[nearColor[4][0]][0], color.data[nearColor[4][0]][1], color.data[nearColor[4][0]][2], color.data[nearColor[4][0]][4]]
+          [
+            color.data[nearColor[0][0]][0],
+            color.data[nearColor[0][0]][1],
+            color.data[nearColor[0][0]][2],
+            color.data[nearColor[0][0]][4],
+          ],
+          [
+            color.data[nearColor[1][0]][0],
+            color.data[nearColor[1][0]][1],
+            color.data[nearColor[1][0]][2],
+            color.data[nearColor[1][0]][4],
+          ],
+          [
+            color.data[nearColor[2][0]][0],
+            color.data[nearColor[2][0]][1],
+            color.data[nearColor[2][0]][2],
+            color.data[nearColor[2][0]][4],
+          ],
+          [
+            color.data[nearColor[3][0]][0],
+            color.data[nearColor[3][0]][1],
+            color.data[nearColor[3][0]][2],
+            color.data[nearColor[3][0]][4],
+          ],
+          [
+            color.data[nearColor[4][0]][0],
+            color.data[nearColor[4][0]][1],
+            color.data[nearColor[4][0]][2],
+            color.data[nearColor[4][0]][4],
+          ],
         ];
 
         const ssMaterial = this.multipleRegressionAnalysis(shadowS);
-        this.colorValue[i].hsvShadowColor[1] = parseInt((ssMaterial[0]*baseH) + (ssMaterial[1]*baseS) + (ssMaterial[2]*baseV) + ssMaterial[3]);
-        if((this.colorValue[i].hsvShadowColor[1] < 0)||(this.colorValue[i].hsvShadowColor[1] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[1]) === false)){
-          this.colorValue[i].hsvShadowColor[1] = Math.round((Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[0][0]][4]) + Number(color.data[nearColor[1][0]][4]) + Number(color.data[nearColor[2][0]][4])) / 5);
+        this.colorValue[i].hsvShadowColor[1] = parseInt(
+          ssMaterial[0] * baseH +
+            ssMaterial[1] * baseS +
+            ssMaterial[2] * baseV +
+            ssMaterial[3]
+        );
+        if (
+          this.colorValue[i].hsvShadowColor[1] < 0 ||
+          this.colorValue[i].hsvShadowColor[1] > 100 ||
+          isFinite(this.colorValue[i].hsvShadowColor[1]) === false
+        ) {
+          this.colorValue[i].hsvShadowColor[1] = Math.round(
+            (Number(color.data[nearColor[0][0]][4]) +
+              Number(color.data[nearColor[0][0]][4]) +
+              Number(color.data[nearColor[0][0]][4]) +
+              Number(color.data[nearColor[1][0]][4]) +
+              Number(color.data[nearColor[2][0]][4])) /
+              5
+          );
           console.log("no data shadowS " + i);
         }
 
         // 影色Vの決定
         shadowV = [
-          [color.data[nearColor[0][0]][0], color.data[nearColor[0][0]][1], color.data[nearColor[0][0]][2], color.data[nearColor[0][0]][5]],
-          [color.data[nearColor[1][0]][0], color.data[nearColor[1][0]][1], color.data[nearColor[1][0]][2], color.data[nearColor[1][0]][5]],
-          [color.data[nearColor[2][0]][0], color.data[nearColor[2][0]][1], color.data[nearColor[2][0]][2], color.data[nearColor[2][0]][5]],
-          [color.data[nearColor[3][0]][0], color.data[nearColor[3][0]][1], color.data[nearColor[3][0]][2], color.data[nearColor[3][0]][5]],
-          [color.data[nearColor[4][0]][0], color.data[nearColor[4][0]][1], color.data[nearColor[4][0]][2], color.data[nearColor[4][0]][5]]
+          [
+            color.data[nearColor[0][0]][0],
+            color.data[nearColor[0][0]][1],
+            color.data[nearColor[0][0]][2],
+            color.data[nearColor[0][0]][5],
+          ],
+          [
+            color.data[nearColor[1][0]][0],
+            color.data[nearColor[1][0]][1],
+            color.data[nearColor[1][0]][2],
+            color.data[nearColor[1][0]][5],
+          ],
+          [
+            color.data[nearColor[2][0]][0],
+            color.data[nearColor[2][0]][1],
+            color.data[nearColor[2][0]][2],
+            color.data[nearColor[2][0]][5],
+          ],
+          [
+            color.data[nearColor[3][0]][0],
+            color.data[nearColor[3][0]][1],
+            color.data[nearColor[3][0]][2],
+            color.data[nearColor[3][0]][5],
+          ],
+          [
+            color.data[nearColor[4][0]][0],
+            color.data[nearColor[4][0]][1],
+            color.data[nearColor[4][0]][2],
+            color.data[nearColor[4][0]][5],
+          ],
         ];
 
         const svMaterial = this.multipleRegressionAnalysis(shadowV);
-        this.colorValue[i].hsvShadowColor[2] = parseInt((svMaterial[0]*baseH) + (svMaterial[1]*baseS) + (svMaterial[2]*baseV) + svMaterial[3]);
-        if((this.colorValue[i].hsvShadowColor[2] < 0)||(this.colorValue[i].hsvShadowColor[2] > 100)||(isFinite(this.colorValue[i].hsvShadowColor[2]) === false)){
-          this.colorValue[i].hsvShadowColor[2] = Math.round((Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[0][0]][5]) + Number(color.data[nearColor[1][0]][5]) + Number(color.data[nearColor[2][0]][5])) / 5);
-          console.log("no data shadowV " + i)
+        this.colorValue[i].hsvShadowColor[2] = parseInt(
+          svMaterial[0] * baseH +
+            svMaterial[1] * baseS +
+            svMaterial[2] * baseV +
+            svMaterial[3]
+        );
+        if (
+          this.colorValue[i].hsvShadowColor[2] < 0 ||
+          this.colorValue[i].hsvShadowColor[2] > 100 ||
+          isFinite(this.colorValue[i].hsvShadowColor[2]) === false
+        ) {
+          this.colorValue[i].hsvShadowColor[2] = Math.round(
+            (Number(color.data[nearColor[0][0]][5]) +
+              Number(color.data[nearColor[0][0]][5]) +
+              Number(color.data[nearColor[0][0]][5]) +
+              Number(color.data[nearColor[1][0]][5]) +
+              Number(color.data[nearColor[2][0]][5])) /
+              5
+          );
+          console.log("no data shadowV " + i);
         }
 
-        this.colorValue[i].rgbShadowColor = this.hsv2rgb(this.colorValue[i].hsvShadowColor);
-        this.colorValue[i].hexShadowColor = this.rgb2hex(this.colorValue[i].rgbShadowColor);
-        this.colorValue[i].hslShadowColor = this.rgb2hsl(this.colorValue[i].rgbShadowColor);
+        this.colorValue[i].rgbShadowColor = this.hsv2rgb(
+          this.colorValue[i].hsvShadowColor
+        );
+        this.colorValue[i].hexShadowColor = this.rgb2hex(
+          this.colorValue[i].rgbShadowColor
+        );
+        this.colorValue[i].hslShadowColor = this.rgb2hsl(
+          this.colorValue[i].rgbShadowColor
+        );
 
         // ハイライト
         // nearColorの初期化
@@ -295,27 +404,31 @@ export default {
           [0, 360],
           [0, 360],
           [0, 360],
-          [0, 360]
+          [0, 360],
         ];
 
         // baseColorに近い色を5個取得
-        for(j = 1; j < highlight.data.length; j++){
-          csvBaseColor = [highlight.data[j][0], highlight.data[j][1], highlight.data[j][2]];
+        for (j = 1; j < highlight.data.length; j++) {
+          csvBaseColor = [
+            highlight.data[j][0],
+            highlight.data[j][1],
+            highlight.data[j][2],
+          ];
           len = this.calcLen3d(this.colorValue[i].hsvBaseColor, csvBaseColor);
-          if(len < nearColor[5][1]){
+          if (len < nearColor[5][1]) {
             nearColor[5][0] = j;
             nearColor[5][1] = len;
 
             // バブルソート
-            for(k = 0; k < nearColor.length; k++){
-              for(l = nearColor.length-1; l > k ; l--){
-                if(nearColor[l][1] < nearColor[l-1][1]){
+            for (k = 0; k < nearColor.length; k++) {
+              for (l = nearColor.length - 1; l > k; l--) {
+                if (nearColor[l][1] < nearColor[l - 1][1]) {
                   tmp1 = nearColor[l][0];
                   tmp2 = nearColor[l][1];
-                  nearColor[l][0] = nearColor[l-1][0];
-                  nearColor[l][1] = nearColor[l-1][1];
-                  nearColor[l-1][0] =tmp1;
-                  nearColor[l-1][1] =tmp2;
+                  nearColor[l][0] = nearColor[l - 1][0];
+                  nearColor[l][1] = nearColor[l - 1][1];
+                  nearColor[l - 1][0] = tmp1;
+                  nearColor[l - 1][1] = tmp2;
                 }
               }
             }
@@ -323,53 +436,144 @@ export default {
         }
 
         // ハイライトHの決定
-        highlightH = Math.round((Number(highlight.data[nearColor[0][0]][3]) + this.colorValue[i].hsvBaseColor[0])/2);
+        highlightH = Math.round(
+          (Number(highlight.data[nearColor[0][0]][3]) +
+            this.colorValue[i].hsvBaseColor[0]) /
+            2
+        );
         this.colorValue[i].hsvHighlightColor[0] = highlightH;
 
         // ハイライトSの決定
         highlightS = [
-          [highlight.data[nearColor[0][0]][0], highlight.data[nearColor[0][0]][1], highlight.data[nearColor[0][0]][2], highlight.data[nearColor[0][0]][4]],
-          [highlight.data[nearColor[1][0]][0], highlight.data[nearColor[1][0]][1], highlight.data[nearColor[1][0]][2], highlight.data[nearColor[1][0]][4]],
-          [highlight.data[nearColor[2][0]][0], highlight.data[nearColor[2][0]][1], highlight.data[nearColor[2][0]][2], highlight.data[nearColor[2][0]][4]],
-          [highlight.data[nearColor[3][0]][0], highlight.data[nearColor[3][0]][1], highlight.data[nearColor[3][0]][2], highlight.data[nearColor[3][0]][4]],
-          [highlight.data[nearColor[4][0]][0], highlight.data[nearColor[4][0]][1], highlight.data[nearColor[4][0]][2], highlight.data[nearColor[4][0]][4]]
+          [
+            highlight.data[nearColor[0][0]][0],
+            highlight.data[nearColor[0][0]][1],
+            highlight.data[nearColor[0][0]][2],
+            highlight.data[nearColor[0][0]][4],
+          ],
+          [
+            highlight.data[nearColor[1][0]][0],
+            highlight.data[nearColor[1][0]][1],
+            highlight.data[nearColor[1][0]][2],
+            highlight.data[nearColor[1][0]][4],
+          ],
+          [
+            highlight.data[nearColor[2][0]][0],
+            highlight.data[nearColor[2][0]][1],
+            highlight.data[nearColor[2][0]][2],
+            highlight.data[nearColor[2][0]][4],
+          ],
+          [
+            highlight.data[nearColor[3][0]][0],
+            highlight.data[nearColor[3][0]][1],
+            highlight.data[nearColor[3][0]][2],
+            highlight.data[nearColor[3][0]][4],
+          ],
+          [
+            highlight.data[nearColor[4][0]][0],
+            highlight.data[nearColor[4][0]][1],
+            highlight.data[nearColor[4][0]][2],
+            highlight.data[nearColor[4][0]][4],
+          ],
         ];
 
         const hsMaterial = this.multipleRegressionAnalysis(highlightS);
-        this.colorValue[i].hsvHighlightColor[1] = parseInt((hsMaterial[0]*baseH) + (hsMaterial[1]*baseS) + (hsMaterial[2]*baseV) + hsMaterial[3]);
-        if((this.colorValue[i].hsvHighlightColor[1] < 0)||(this.colorValue[i].hsvHighlightColor[1] > 100)||(isFinite(this.colorValue[i].hsvHighlightColor[1]) === false)){
-          this.colorValue[i].hsvHighlightColor[1] = Math.round((Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[0][0]][4]) + Number(highlight.data[nearColor[1][0]][4]) + Number(highlight.data[nearColor[2][0]][4])) / 5);
+        this.colorValue[i].hsvHighlightColor[1] = parseInt(
+          hsMaterial[0] * baseH +
+            hsMaterial[1] * baseS +
+            hsMaterial[2] * baseV +
+            hsMaterial[3]
+        );
+        if (
+          this.colorValue[i].hsvHighlightColor[1] < 0 ||
+          this.colorValue[i].hsvHighlightColor[1] > 100 ||
+          isFinite(this.colorValue[i].hsvHighlightColor[1]) === false
+        ) {
+          this.colorValue[i].hsvHighlightColor[1] = Math.round(
+            (Number(highlight.data[nearColor[0][0]][4]) +
+              Number(highlight.data[nearColor[0][0]][4]) +
+              Number(highlight.data[nearColor[0][0]][4]) +
+              Number(highlight.data[nearColor[1][0]][4]) +
+              Number(highlight.data[nearColor[2][0]][4])) /
+              5
+          );
           console.log("no data highlightS " + i);
         }
 
         // ハイライトVの決定
         highlightV = [
-          [highlight.data[nearColor[0][0]][0], highlight.data[nearColor[0][0]][1], highlight.data[nearColor[0][0]][2], highlight.data[nearColor[0][0]][5]],
-          [highlight.data[nearColor[1][0]][0], highlight.data[nearColor[1][0]][1], highlight.data[nearColor[1][0]][2], highlight.data[nearColor[1][0]][5]],
-          [highlight.data[nearColor[2][0]][0], highlight.data[nearColor[2][0]][1], highlight.data[nearColor[2][0]][2], highlight.data[nearColor[2][0]][5]],
-          [highlight.data[nearColor[3][0]][0], highlight.data[nearColor[3][0]][1], highlight.data[nearColor[3][0]][2], highlight.data[nearColor[3][0]][5]],
-          [highlight.data[nearColor[4][0]][0], highlight.data[nearColor[4][0]][1], highlight.data[nearColor[4][0]][2], highlight.data[nearColor[4][0]][5]]
+          [
+            highlight.data[nearColor[0][0]][0],
+            highlight.data[nearColor[0][0]][1],
+            highlight.data[nearColor[0][0]][2],
+            highlight.data[nearColor[0][0]][5],
+          ],
+          [
+            highlight.data[nearColor[1][0]][0],
+            highlight.data[nearColor[1][0]][1],
+            highlight.data[nearColor[1][0]][2],
+            highlight.data[nearColor[1][0]][5],
+          ],
+          [
+            highlight.data[nearColor[2][0]][0],
+            highlight.data[nearColor[2][0]][1],
+            highlight.data[nearColor[2][0]][2],
+            highlight.data[nearColor[2][0]][5],
+          ],
+          [
+            highlight.data[nearColor[3][0]][0],
+            highlight.data[nearColor[3][0]][1],
+            highlight.data[nearColor[3][0]][2],
+            highlight.data[nearColor[3][0]][5],
+          ],
+          [
+            highlight.data[nearColor[4][0]][0],
+            highlight.data[nearColor[4][0]][1],
+            highlight.data[nearColor[4][0]][2],
+            highlight.data[nearColor[4][0]][5],
+          ],
         ];
 
         const hvMaterial = this.multipleRegressionAnalysis(highlightV);
-        this.colorValue[i].hsvHighlightColor[2] = parseInt((hvMaterial[0]*baseH) + (hvMaterial[1]*baseS) + (hvMaterial[2]*baseV) + hvMaterial[3]);
-        if((this.colorValue[i].hsvHighlightColor[2] < 0)||(this.colorValue[i].hsvHighlightColor[2] > 100)||(isFinite(this.colorValue[i].hsvHighlightColor[2]) === false)){
-          this.colorValue[i].hsvHighlightColor[2] = Math.round((Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[0][0]][5]) + Number(highlight.data[nearColor[1][0]][5]) + Number(highlight.data[nearColor[2][0]][5])) / 5);
+        this.colorValue[i].hsvHighlightColor[2] = parseInt(
+          hvMaterial[0] * baseH +
+          hvMaterial[1] * baseS +
+          hvMaterial[2] * baseV +
+          hvMaterial[3]
+        );
+        if (
+          this.colorValue[i].hsvHighlightColor[2] < 0 ||
+          this.colorValue[i].hsvHighlightColor[2] > 100 ||
+          isFinite(this.colorValue[i].hsvHighlightColor[2]) === false
+        ) {
+          this.colorValue[i].hsvHighlightColor[2] = Math.round(
+            (Number(highlight.data[nearColor[0][0]][5]) +
+              Number(highlight.data[nearColor[0][0]][5]) +
+              Number(highlight.data[nearColor[0][0]][5]) +
+              Number(highlight.data[nearColor[1][0]][5]) +
+              Number(highlight.data[nearColor[2][0]][5])) /
+              5
+          );
           console.log("no data highlightV " + i);
         }
 
-        this.colorValue[i].rgbHighlightColor = this.hsv2rgb(this.colorValue[i].hsvHighlightColor);
-        this.colorValue[i].hexHighlightColor = this.rgb2hex(this.colorValue[i].rgbHighlightColor);
-        this.colorValue[i].hslHighlightColor = this.rgb2hsl(this.colorValue[i].rgbHighlightColor);
-
+        this.colorValue[i].rgbHighlightColor = this.hsv2rgb(
+          this.colorValue[i].hsvHighlightColor
+        );
+        this.colorValue[i].hexHighlightColor = this.rgb2hex(
+          this.colorValue[i].rgbHighlightColor
+        );
+        this.colorValue[i].hslHighlightColor = this.rgb2hsl(
+          this.colorValue[i].rgbHighlightColor
+        );
       }
     },
-    resetColor(){
+    resetColor() {
       console.log("move reset");
       this.colorValue = [];
     },
     //重回帰分析
-    multipleRegressionAnalysis(input){
+    multipleRegressionAnalysis(input) {
       let xsum = 0; /* 測定値xの総和を格納する変数xsumを宣言 */
       let ysum = 0; /* 測定値yの総和を格納する変数ysumを宣言 */
       let zsum = 0; /* 測定値zの総和を格納する変数zsumを宣言 */
@@ -429,7 +633,7 @@ export default {
       let det0, det1, det2, det3;
       let a, b, c, d;
 
-      for(i = 0; i < n; ++i){
+      for (i = 0; i < n; ++i) {
         eachdata = input[i];
 
         x[i] = parseFloat(eachdata[0]);
@@ -448,26 +652,26 @@ export default {
       zave = zsum / n;
       wave = wsum / n;
 
-      for(i = 0; i < n; ++i){
-        xd[i] = Math.pow((x[i] - xave),2);
+      for (i = 0; i < n; ++i) {
+        xd[i] = Math.pow(x[i] - xave, 2);
         /* i番目のxの残差の二乗をxd[i]に代入 */
-        yd[i] = Math.pow((y[i] - yave),2);
+        yd[i] = Math.pow(y[i] - yave, 2);
         /* i番目のyの残差の二乗をyd[i]に代入 */
-        zd[i] = Math.pow((z[i] - zave),2);
+        zd[i] = Math.pow(z[i] - zave, 2);
         /* i番目のzの残差の二乗をzd[i]に代入 */
-        wd[i] = Math.pow((w[i] - wave),2);
+        wd[i] = Math.pow(w[i] - wave, 2);
         /* i番目のwの残差の二乗をwd[i]に代入 */
-        xyd[i] = (x[i]-xave)*(y[i] - yave);
+        xyd[i] = (x[i] - xave) * (y[i] - yave);
         /* i番目のxの残差とyの残差との積をxyd[i]に代入 */
-        xzd[i] = (x[i] - xave)*(z[i] - zave);
+        xzd[i] = (x[i] - xave) * (z[i] - zave);
         /* i番目のxの残差とzの残差との積をxzd[i]に代入 */
-        yzd[i] = (y[i] - yave)*(z[i] - zave);
+        yzd[i] = (y[i] - yave) * (z[i] - zave);
         /* i番目のyの残差とzの残差との積をyzd[i]に代入 */
-        xwd[i] = (x[i] - xave)*(w[i] - wave);
+        xwd[i] = (x[i] - xave) * (w[i] - wave);
         /* i番目のxの残差とwの残差との積をxwd[i]に代入 */
-        ywd[i] = (y[i] - yave)*(w[i] - wave);
+        ywd[i] = (y[i] - yave) * (w[i] - wave);
         /* i番目のyの残差とwの残差との積をywd[i]に代入 */
-        zwd[i] = (z[i] - zave)*(w[i] - wave);
+        zwd[i] = (z[i] - zave) * (w[i] - wave);
         /* i番目のzの残差とwの残差との積をzwd[i]に代入 */
 
         xdsum = xdsum + xd[i];
@@ -493,29 +697,40 @@ export default {
       syw = ywdsum / n;
       szw = zwdsum / n;
 
-      det0 = sx2*(sy2*sz2-syz*syz)+sxy*(syz*sxz-sxy*sz2)+sxz*(sxy*syz-sy2*sxz);
-      det1 = sxw*(sy2*sz2-syz*syz)+sxy*(syz*szw-syw*sz2)+sxz*(syw*syz-sy2*szw);
-      det2 = sx2*(syw*sz2-syz*szw)+sxw*(syz*sxz-sxy*sz2)+sxz*(sxy*szw-syw*sxz);
-      det3 = sx2*(sy2*szw-syw*syz)+sxy*(syw*sxz-sxy*szw)+sxw*(sxy*syz-sy2*sxz);
+      det0 =
+        sx2 * (sy2 * sz2 - syz * syz) +
+        sxy * (syz * sxz - sxy * sz2) +
+        sxz * (sxy * syz - sy2 * sxz);
+      det1 =
+        sxw * (sy2 * sz2 - syz * syz) +
+        sxy * (syz * szw - syw * sz2) +
+        sxz * (syw * syz - sy2 * szw);
+      det2 =
+        sx2 * (syw * sz2 - syz * szw) +
+        sxw * (syz * sxz - sxy * sz2) +
+        sxz * (sxy * szw - syw * sxz);
+      det3 =
+        sx2 * (sy2 * szw - syw * syz) +
+        sxy * (syw * sxz - sxy * szw) +
+        sxw * (sxy * syz - sy2 * sxz);
 
       a = det1 / det0;
       b = det2 / det0;
       c = det3 / det0;
-      d = wave - (a*xave + b*yave + c*zave);
-      rxy = sxy/(Math.sqrt(sx2*sy2));
-      rxz = sxz/(Math.sqrt(sx2*sz2));
-      ryz = syz/(Math.sqrt(sy2*sz2));
-      rxw = sxw/(Math.sqrt(sx2*sw2));
-      ryw = syw/(Math.sqrt(sy2*sw2));
-      rzw = szw/(Math.sqrt(sz2*sw2));
+      d = wave - (a * xave + b * yave + c * zave);
+      rxy = sxy / Math.sqrt(sx2 * sy2);
+      rxz = sxz / Math.sqrt(sx2 * sz2);
+      ryz = syz / Math.sqrt(sy2 * sz2);
+      rxw = sxw / Math.sqrt(sx2 * sw2);
+      ryw = syw / Math.sqrt(sy2 * sw2);
+      rzw = szw / Math.sqrt(sz2 * sw2);
 
       const value = [a, b, c, d];
 
-      return value
-
+      return value;
     },
     //クラスタリング　最短距離法　色相決定
-    clustering(h){
+    clustering(h) {
       const x = 0; //原点x
       const y = 0; //原点y
       const r = 100; //半径(長さ)
@@ -525,8 +740,11 @@ export default {
       let clusterNum = [];
 
       //色相のHを角度とする円座標に変換する
-      for(i = 0; i < h.length; i++){
-        coordinate.push([x + r * Math.cos(h[i] * (Math.PI / 180)), y + r * Math.sin(h[i] * (Math.PI / 180))]);
+      for (i = 0; i < h.length; i++) {
+        coordinate.push([
+          x + r * Math.cos(h[i] * (Math.PI / 180)),
+          y + r * Math.sin(h[i] * (Math.PI / 180)),
+        ]);
         clusterNum.push(i);
       }
 
@@ -542,99 +760,150 @@ export default {
       let clusterNumTmp2; //追加クラスタのクラスタ番号を保管しておく一時的な変数
 
       //クラスタリング
-      while(clusterNum.length > 1){
+      while (clusterNum.length > 1) {
         //minLenの初期化
         minLen = 200;
 
-        for(i = 0; i < clusterNum.length; i++){
-          for(j = i + 1; j < clusterNum.length; j++){
-            if((clusterNum[i] > clusterSizeCheck) && (clusterNum[j] > clusterSizeCheck)){
+        for (i = 0; i < clusterNum.length; i++) {
+          for (j = i + 1; j < clusterNum.length; j++) {
+            if (
+              clusterNum[i] > clusterSizeCheck &&
+              clusterNum[j] > clusterSizeCheck
+            ) {
               len = 200;
-              for(k = 3; k < cluster[clusterNum[i]-clusterNumSize].length; k++){
-                for(l = 3; l < cluster[clusterNum[j]-clusterNumSize].length; l++){
-                  lenTmp = this.calcLen2d(coordinate[cluster[clusterNum[i]-clusterNumSize][k]], coordinate[cluster[clusterNum[j]-clusterNumSize][l]]);
-                  if(lenTmp < len){
+              for (
+                k = 3;
+                k < cluster[clusterNum[i] - clusterNumSize].length;
+                k++
+              ) {
+                for (
+                  l = 3;
+                  l < cluster[clusterNum[j] - clusterNumSize].length;
+                  l++
+                ) {
+                  lenTmp = this.calcLen2d(
+                    coordinate[cluster[clusterNum[i] - clusterNumSize][k]],
+                    coordinate[cluster[clusterNum[j] - clusterNumSize][l]]
+                  );
+                  if (lenTmp < len) {
                     len = lenTmp;
                   }
                 }
               }
-
-            }else if(clusterNum[j] > clusterSizeCheck){
+            } else if (clusterNum[j] > clusterSizeCheck) {
               len = 200;
-              for(k = 3; k < cluster[clusterNum[j]-clusterNumSize].length; k++){
-                lenTmp = this.calcLen2d(coordinate[clusterNum[i]], coordinate[cluster[clusterNum[j]-clusterNumSize][k]]);
-                if(lenTmp < len){
+              for (
+                k = 3;
+                k < cluster[clusterNum[j] - clusterNumSize].length;
+                k++
+              ) {
+                lenTmp = this.calcLen2d(
+                  coordinate[clusterNum[i]],
+                  coordinate[cluster[clusterNum[j] - clusterNumSize][k]]
+                );
+                if (lenTmp < len) {
                   len = lenTmp;
                 }
               }
-
-            }else{
-              len = this.calcLen2d(coordinate[clusterNum[i]], coordinate[clusterNum[j]]);
-
+            } else {
+              len = this.calcLen2d(
+                coordinate[clusterNum[i]],
+                coordinate[clusterNum[j]]
+              );
             }
 
-            if(len < minLen){
+            if (len < minLen) {
               minLen = len;
               clusterNumTmp1 = clusterNum[i];
               clusterNumTmp2 = clusterNum[j];
-
             }
           }
         }
 
-        if((clusterNumTmp1 > clusterSizeCheck) && (clusterNumTmp2 > clusterSizeCheck)){
+        if (
+          clusterNumTmp1 > clusterSizeCheck &&
+          clusterNumTmp2 > clusterSizeCheck
+        ) {
           cluster.push([clusterNumTmp1, clusterNumTmp2, minLen]);
-          for(i = 3; i < cluster[clusterNumTmp1-clusterNumSize].length; i++){
-            cluster[cluster.length-1].push(cluster[clusterNumTmp1-clusterNumSize][i]);
+          for (
+            i = 3;
+            i < cluster[clusterNumTmp1 - clusterNumSize].length;
+            i++
+          ) {
+            cluster[cluster.length - 1].push(
+              cluster[clusterNumTmp1 - clusterNumSize][i]
+            );
           }
-          for(i = 3; i < cluster[clusterNumTmp2-clusterNumSize].length; i++){
-            cluster[cluster.length-1].push(cluster[clusterNumTmp2-clusterNumSize][i]);
+          for (
+            i = 3;
+            i < cluster[clusterNumTmp2 - clusterNumSize].length;
+            i++
+          ) {
+            cluster[cluster.length - 1].push(
+              cluster[clusterNumTmp2 - clusterNumSize][i]
+            );
           }
-
-        }else if(clusterNumTmp2 > clusterSizeCheck){
-          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterNumTmp1]);
-          for(i = 3; i < cluster[clusterNumTmp2-clusterNumSize].length; i++){
-            cluster[cluster.length-1].push(cluster[clusterNumTmp2-clusterNumSize][i]);
+        } else if (clusterNumTmp2 > clusterSizeCheck) {
+          cluster.push([
+            clusterNumTmp1,
+            clusterNumTmp2,
+            minLen,
+            clusterNumTmp1,
+          ]);
+          for (
+            i = 3;
+            i < cluster[clusterNumTmp2 - clusterNumSize].length;
+            i++
+          ) {
+            cluster[cluster.length - 1].push(
+              cluster[clusterNumTmp2 - clusterNumSize][i]
+            );
           }
-        
-        }else{
-          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterNumTmp1, clusterNumTmp2]);
-          
+        } else {
+          cluster.push([
+            clusterNumTmp1,
+            clusterNumTmp2,
+            minLen,
+            clusterNumTmp1,
+            clusterNumTmp2,
+          ]);
         }
-        clusterNum = this.arrayElemDel(clusterNum, clusterNumTmp1, clusterNumTmp2);
-  
+        clusterNum = this.arrayElemDel(
+          clusterNum,
+          clusterNumTmp1,
+          clusterNumTmp2
+        );
+
         clusterNum.push(clusterNumEnd);
         clusterNumEnd++;
-
       }
 
-      for(i = 0; i < cluster.length; i++){
+      for (i = 0; i < cluster.length; i++) {
         console.log("elem:" + cluster[i][0] + " " + cluster[i][1]);
         console.log("len:" + cluster[i][2]);
-        for(j = 3; j < cluster[i].length; j++){
+        for (j = 3; j < cluster[i].length; j++) {
           console.log(cluster[i][j]);
         }
         console.log("------------");
       }
-
-
     },
-    calcLen3d(a, b){
-      return Math.sqrt(Math.pow( a[0]-b[0], 2 ) + Math.pow( a[1]-b[1], 2 ) + Math.pow( a[2]-b[2], 2 ))
-
+    calcLen3d(a, b) {
+      return Math.sqrt(
+        Math.pow(a[0] - b[0], 2) +
+          Math.pow(a[1] - b[1], 2) +
+          Math.pow(a[2] - b[2], 2)
+      );
     },
-    calcLen2d(a, b){
-      return Math.sqrt(Math.pow( a[0]-b[0], 2 ) + Math.pow( a[1]-b[1], 2 ))
-
+    calcLen2d(a, b) {
+      return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
     },
-    arrayElemDel(array, a, b){
-      let tmp1 = array.filter(item => item !== a);
-      let tmp2 = tmp1.filter(item => item !== b);
+    arrayElemDel(array, a, b) {
+      let tmp1 = array.filter((item) => item !== a);
+      let tmp2 = tmp1.filter((item) => item !== b);
 
       return tmp2;
-
     },
-    hsv2rgb(input){
+    hsv2rgb(input) {
       let h = input[0] / 60;
       let s = input[1] / 100;
       let v = input[2] / 100;
@@ -688,30 +957,27 @@ export default {
         g = Math.round(rgb[1] * 255);
         b = Math.round(rgb[2] * 255);
       }
-      
-      const value = [r, g, b];
-        
-      return value
 
+      const value = [r, g, b];
+
+      return value;
     },
     hex2rgb(input) {
       const hex = input.split("");
       const r = parseInt(hex[1].toString() + hex[2].toString(), 16);
       const g = parseInt(hex[3].toString() + hex[4].toString(), 16);
       const b = parseInt(hex[5].toString() + hex[6].toString(), 16);
-      const rgb = [r,g,b]
+      const rgb = [r, g, b];
 
-      return rgb
-    
+      return rgb;
     },
     rgb2hex(input) {
       const rHex = ("0" + Number(input[0]).toString(16)).slice(-2);
       const gHex = ("0" + Number(input[1]).toString(16)).slice(-2);
       const bHex = ("0" + Number(input[2]).toString(16)).slice(-2);
       const hex = "#" + rHex + gHex + bHex;
-      
-      return hex
-    
+
+      return hex;
     },
     rgb2hsv(input) {
       let r = Number(input[0]) / 255;
@@ -750,8 +1016,7 @@ export default {
       const vv = Math.round(v * 100);
       const hsv = [hv, sv, vv];
 
-      return hsv
-
+      return hsv;
     },
     rgb2hsl(input) {
       let r = Number(input[0]);
@@ -806,8 +1071,7 @@ export default {
       const ll = Math.round(l);
       const hsl = [hl, sl, ll];
 
-      return hsl
-
+      return hsl;
     },
   },
 };

@@ -137,15 +137,15 @@ export default {
     },
     colorSpace: {
       type: String,
-      default: '',
+      default: "",
     },
     label: {
       type: String,
-      default: '',
+      default: "",
     },
     inputColor: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   data() {

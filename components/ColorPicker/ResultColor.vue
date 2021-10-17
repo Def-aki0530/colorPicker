@@ -2,7 +2,10 @@
   <div class="result-color">
     <div class="result-color-label">{{ label }}</div>
     <div class="result-color-contents">
-      <label class="color-preview" :style="{ background: hexResultColor }"></label>
+      <label
+        class="color-preview"
+        :style="{ background: hexResultColor }"
+      ></label>
       <div class="result-value-area" v-if="colorSpace === '1'">
         <div class="result-value">
           <p>R</p>
@@ -54,19 +57,19 @@ export default {
   props: {
     id: {
       type: String,
-      default: '',
+      default: "",
     },
     colorSpace: {
       type: String,
-      default: ''
+      default: "",
     },
     label: {
       type: String,
-      default: ''
+      default: "",
     },
     hexResultColor: {
       type: String,
-      default: '',
+      default: "",
     },
     rgbResultColor: {
       type: Array,
@@ -79,8 +82,8 @@ export default {
     hslResultColor: {
       type: Array,
       default: () => [],
-    }
-  }
+    },
+  },
 };
 </script>
 

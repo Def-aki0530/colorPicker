@@ -13,11 +13,11 @@ export default {
   props: {
     id: {
       type: String,
-      default: '',
+      default: "",
     },
     value: {
       type: String,
-      default: '',
+      default: "",
       required: true,
     },
     options: {
@@ -27,7 +27,7 @@ export default {
     },
     width: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   methods: {
