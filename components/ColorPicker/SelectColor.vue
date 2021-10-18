@@ -748,43 +748,32 @@ export default {
         clusterNum.push(i);
       }
 
+      const clusterNumSize = clusterNum.length;
+      const clusterSizeCheck = clusterNum.length - 1;
+      const clusterSplitLen = 30;
+
       let clusterNumEnd = clusterNum.length;
-      let clusterNumSize = clusterNum.length;
-      let clusterSizeCheck = clusterNum.length - 1;
-      let cluster = []; // 要素1, 要素2, 要素間距離, クラスタの構成要素1, クラスタの構成要素2, クラスタの構成要素n
+      let cluster = []; // 要素1, 要素2, 要素間距離, 構成要素総距離, クラスタの構成要素1, クラスタの構成要素2, クラスタの構成要素n
 
       let len;
       let lenTmp;
+      let clusterLen;
       let minLen = 200;
       let clusterNumTmp1; //追加クラスタのクラスタ番号を保管しておく一時的な変数
       let clusterNumTmp2; //追加クラスタのクラスタ番号を保管しておく一時的な変数
 
-      //クラスタリング
+      //クラスタリング(階層化)
       while (clusterNum.length > 1) {
         //minLenの初期化
         minLen = 200;
 
         for (i = 0; i < clusterNum.length; i++) {
           for (j = i + 1; j < clusterNum.length; j++) {
-            if (
-              clusterNum[i] > clusterSizeCheck &&
-              clusterNum[j] > clusterSizeCheck
-            ) {
+            if (clusterNum[i] > clusterSizeCheck && clusterNum[j] > clusterSizeCheck) {
               len = 200;
-              for (
-                k = 3;
-                k < cluster[clusterNum[i] - clusterNumSize].length;
-                k++
-              ) {
-                for (
-                  l = 3;
-                  l < cluster[clusterNum[j] - clusterNumSize].length;
-                  l++
-                ) {
-                  lenTmp = this.calcLen2d(
-                    coordinate[cluster[clusterNum[i] - clusterNumSize][k]],
-                    coordinate[cluster[clusterNum[j] - clusterNumSize][l]]
-                  );
+              for (k = 4; k < cluster[clusterNum[i] - clusterNumSize].length; k++) {
+                for (l = 4; l < cluster[clusterNum[j] - clusterNumSize].length; l++) {
+                  lenTmp = this.calcLen2d(coordinate[cluster[clusterNum[i] - clusterNumSize][k]], coordinate[cluster[clusterNum[j] - clusterNumSize][l]]);
                   if (lenTmp < len) {
                     len = lenTmp;
                   }
@@ -792,15 +781,8 @@ export default {
               }
             } else if (clusterNum[j] > clusterSizeCheck) {
               len = 200;
-              for (
-                k = 3;
-                k < cluster[clusterNum[j] - clusterNumSize].length;
-                k++
-              ) {
-                lenTmp = this.calcLen2d(
-                  coordinate[clusterNum[i]],
-                  coordinate[cluster[clusterNum[j] - clusterNumSize][k]]
-                );
+              for (k = 4; k < cluster[clusterNum[j] - clusterNumSize].length; k++) {
+                lenTmp = this.calcLen2d(coordinate[clusterNum[i]], coordinate[cluster[clusterNum[j] - clusterNumSize][k]]);
                 if (lenTmp < len) {
                   len = lenTmp;
                 }
@@ -820,78 +802,91 @@ export default {
           }
         }
 
-        if (
-          clusterNumTmp1 > clusterSizeCheck &&
-          clusterNumTmp2 > clusterSizeCheck
-        ) {
-          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen]);
-          for (
-            i = 3;
-            i < cluster[clusterNumTmp1 - clusterNumSize].length;
-            i++
-          ) {
-            cluster[cluster.length - 1].push(
-              cluster[clusterNumTmp1 - clusterNumSize][i]
-            );
+        if (clusterNumTmp1 > clusterSizeCheck && clusterNumTmp2 > clusterSizeCheck) {
+          clusterLen = minLen + cluster[clusterNumTmp1 - clusterNumSize][3] + cluster[clusterNumTmp2 - clusterNumSize][3];
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterLen]);
+          for (i = 4; i < cluster[clusterNumTmp1 - clusterNumSize].length; i++) {
+            cluster[cluster.length - 1].push(cluster[clusterNumTmp1 - clusterNumSize][i]);
           }
-          for (
-            i = 3;
-            i < cluster[clusterNumTmp2 - clusterNumSize].length;
-            i++
-          ) {
-            cluster[cluster.length - 1].push(
-              cluster[clusterNumTmp2 - clusterNumSize][i]
-            );
+          for (i = 4; i < cluster[clusterNumTmp2 - clusterNumSize].length; i++) {
+            cluster[cluster.length - 1].push(cluster[clusterNumTmp2 - clusterNumSize][i]);
           }
         } else if (clusterNumTmp2 > clusterSizeCheck) {
-          cluster.push([
-            clusterNumTmp1,
-            clusterNumTmp2,
-            minLen,
-            clusterNumTmp1,
-          ]);
-          for (
-            i = 3;
-            i < cluster[clusterNumTmp2 - clusterNumSize].length;
-            i++
-          ) {
-            cluster[cluster.length - 1].push(
-              cluster[clusterNumTmp2 - clusterNumSize][i]
-            );
+          clusterLen = minLen + cluster[clusterNumTmp2 - clusterNumSize][3];
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, clusterLen, clusterNumTmp1]);
+          for (i = 4; i < cluster[clusterNumTmp2 - clusterNumSize].length; i++) {
+            cluster[cluster.length - 1].push(cluster[clusterNumTmp2 - clusterNumSize][i]);
           }
         } else {
-          cluster.push([
-            clusterNumTmp1,
-            clusterNumTmp2,
-            minLen,
-            clusterNumTmp1,
-            clusterNumTmp2,
-          ]);
+          cluster.push([clusterNumTmp1, clusterNumTmp2, minLen, minLen, clusterNumTmp1, clusterNumTmp2,]);
         }
-        clusterNum = this.arrayElemDel(
-          clusterNum,
-          clusterNumTmp1,
-          clusterNumTmp2
-        );
+        clusterNum = this.arrayElemDel(clusterNum, clusterNumTmp1, clusterNumTmp2);
 
         clusterNum.push(clusterNumEnd);
         clusterNumEnd++;
       }
 
+      //クラスタリングの過程検証用
+      /*
       for (i = 0; i < cluster.length; i++) {
         console.log("elem:" + cluster[i][0] + " " + cluster[i][1]);
         console.log("len:" + cluster[i][2]);
-        for (j = 3; j < cluster[i].length; j++) {
+        console.log("clusterLen:" + cluster[i][3]);
+        for (j = 4; j < cluster[i].length; j++) {
           console.log(cluster[i][j]);
         }
         console.log("------------");
       }
+      */
+
+      //目的のクラスタに最適化(必要なcoordinateの添字の配列)
+      let targetClusters = [];
+      let targetClustersTmp = [];
+      let targetCluster;
+
+      for (i = 0; i < cluster.length; i++) {
+        if (cluster[i][3] < clusterSplitLen) {
+          for (j = 4; j < cluster[i].length; j++) {
+            if (cluster[i][j] == 0) {
+              targetClustersTmp = [];
+              for (k = 4; k < cluster[i].length; k++) {
+                targetClustersTmp.push(cluster[i][k]);
+              }
+              targetClusters.push(targetClustersTmp);
+            }
+          }
+        }
+      }
+
+      targetCluster = targetClusters[0];
+
+      for (i = 0; i < targetClusters.length; i++) {
+        if (targetCluster.length < targetClusters[i].length) {
+          targetCluster = targetClusters[i];
+        }
+      }
+
+      //目的のクラスタから重心座標を計算
+      let targetX = 0;
+      let targetY = 0;
+
+      console.log(targetCluster);
+
+      for(i = 0; i < targetCluster.length; i++){
+        targetX += coordinate[targetCluster[i]][0];
+        targetY += coordinate[targetCluster[i]][1];
+      }
+  
+      targetX = targetX / targetCluster.length;
+      targetY = targetY / targetCluster.length;
+
+
     },
     calcLen3d(a, b) {
       return Math.sqrt(
         Math.pow(a[0] - b[0], 2) +
-          Math.pow(a[1] - b[1], 2) +
-          Math.pow(a[2] - b[2], 2)
+        Math.pow(a[1] - b[1], 2) +
+        Math.pow(a[2] - b[2], 2)
       );
     },
     calcLen2d(a, b) {
