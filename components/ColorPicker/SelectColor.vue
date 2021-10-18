@@ -253,7 +253,7 @@ export default {
         }
 
         // 影色Hの決定
-        let shadowHData = [
+        shadowH = [
           color.data[nearColor[0][0]][3],
           color.data[nearColor[1][0]][3],
           color.data[nearColor[2][0]][3],
@@ -261,16 +261,7 @@ export default {
           color.data[nearColor[4][0]][3],
         ];
 
-        this.clustering(shadowHData);
-
-        shadowH = Math.round(
-          (Number(color.data[nearColor[0][0]][3]) +
-            Number(color.data[nearColor[0][0]][3]) +
-            Number(color.data[nearColor[0][0]][3]) +
-            this.colorValue[i].hsvBaseColor[0]) /
-            4
-        );
-        this.colorValue[i].hsvShadowColor[0] = shadowH;
+        this.colorValue[i].hsvShadowColor[0] = this.clustering(shadowH);
 
         // 影色Sの決定
         shadowS = [
@@ -436,12 +427,16 @@ export default {
         }
 
         // ハイライトHの決定
-        highlightH = Math.round(
-          (Number(highlight.data[nearColor[0][0]][3]) +
-            this.colorValue[i].hsvBaseColor[0]) /
-            2
-        );
-        this.colorValue[i].hsvHighlightColor[0] = highlightH;
+
+        highlightH = [
+          highlight.data[nearColor[0][0]][3],
+          highlight.data[nearColor[1][0]][3],
+          highlight.data[nearColor[2][0]][3],
+          highlight.data[nearColor[3][0]][3],
+          highlight.data[nearColor[4][0]][3],
+        ];
+
+        this.colorValue[i].hsvHighlightColor[0] = this.clustering(highlightH);
 
         // ハイライトSの決定
         highlightS = [
@@ -730,6 +725,7 @@ export default {
       return value;
     },
     //クラスタリング　最短距離法　色相決定
+    //基本色に一番近い色の影色・ハイライトの色相を含む一定範囲のクラスタの探索
     clustering(h) {
       const x = 0; //原点x
       const y = 0; //原点y
@@ -750,7 +746,7 @@ export default {
 
       const clusterNumSize = clusterNum.length;
       const clusterSizeCheck = clusterNum.length - 1;
-      const clusterSplitLen = 30;
+      const clusterSplitLen = 30; //一定範囲
 
       let clusterNumEnd = clusterNum.length;
       let cluster = []; // 要素1, 要素2, 要素間距離, 構成要素総距離, クラスタの構成要素1, クラスタの構成要素2, クラスタの構成要素n
@@ -860,6 +856,11 @@ export default {
 
       targetCluster = targetClusters[0];
 
+      //基本色に一番近い色の影色・ハイライトの色相がほかのクラスタと離れた外れ値だった時
+      if (typeof targetCluster === "undefined") {
+        targetCluster = [0];
+      }
+
       for (i = 0; i < targetClusters.length; i++) {
         if (targetCluster.length < targetClusters[i].length) {
           targetCluster = targetClusters[i];
@@ -870,16 +871,26 @@ export default {
       let targetX = 0;
       let targetY = 0;
 
-      console.log(targetCluster);
-
-      for(i = 0; i < targetCluster.length; i++){
+      for (i = 0; i < targetCluster.length; i++) {
         targetX += coordinate[targetCluster[i]][0];
         targetY += coordinate[targetCluster[i]][1];
       }
   
       targetX = targetX / targetCluster.length;
-      targetY = targetY / targetCluster.length;
+      targetY = targetY / targetCluster.length;      
 
+      //座標から角度(色相)を計算
+      let angle; //角度
+
+      angle = Math.atan2(targetY, targetX) * 180 / Math.PI
+
+      if (angle < 0) {
+        angle = 360 + angle;
+      }
+
+      angle = Math.round(angle);
+
+      return angle;
 
     },
     calcLen3d(a, b) {
