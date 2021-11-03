@@ -1,6 +1,6 @@
 <template>
   <div class="color-picker">
-    <ColorPickerSelectImage />
+    <ColorPickerSelectImage class="img-column" />
     <ColorPickerSelectColor />
   </div>
 </template>
@@ -16,6 +16,13 @@
   background: $backgroundColor;
   @include mq(xl) {
     flex-direction: column;
+  }
+}
+
+.img-column {
+  display: block;
+  @include mq(xl) {
+    display: none;
   }
 }
 </style>

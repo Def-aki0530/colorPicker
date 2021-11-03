@@ -1,6 +1,6 @@
 <template>
   <div class="header-container">
-    <div class="header-left">hogehoge</div>
+    <div class="header-left">AnimeColorDecision</div>
     <div class="header-right">
       <nuxt-link to="/" :class="{ border: index }">色決定</nuxt-link>
       <nuxt-link to="guide" :class="{ border: guide }">使い方</nuxt-link>

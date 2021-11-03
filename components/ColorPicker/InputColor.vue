@@ -398,7 +398,7 @@ export default {
   width: 60%;
   height: auto;
   @include mq(md) {
-    width: 30%;
+    width: 32%;
     margin-bottom: 10px;
   }
 }

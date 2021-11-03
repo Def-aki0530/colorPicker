@@ -23,7 +23,7 @@ export default {};
     cursor: pointer;
     margin-top: 10px;
     @include mq(md) {
-      width: 30%;
+      width: 32%;
     }
   }
 }
