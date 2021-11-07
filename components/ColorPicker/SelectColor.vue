@@ -162,6 +162,8 @@ export default {
       let shadowH;
       let shadowS = [];
       let shadowV = [];
+      let shadowStmp;
+      let shadowVtmp;
 
       let highlightH;
       let highlightS = [];
@@ -299,6 +301,12 @@ export default {
           );
         }
 
+        //彩度の差が大きい時の乗算処理
+        if (Math.sqrt(Math.pow(this.colorValue[i].hsvShadowColor[1] - baseS, 2)) > 50) {
+          shadowStmp = baseS - ((baseS - (this.colorValue[i].hsvShadowColor[1] * baseS / 100)) * 0.5);
+          this.colorValue[i].hsvShadowColor[1] = Math.round(shadowStmp);
+        }
+
         // 影色Vの決定
         shadowV = [];
         for (j = 0; j < 10; j++){
@@ -333,6 +341,12 @@ export default {
               Number(color.data[nearColor[2][0]][5])
             ) / 3
           );
+        }
+
+        //明度の差が大きい時の乗算処理
+        if (Math.sqrt(Math.pow(this.colorValue[i].hsvShadowColor[2] - baseV, 2)) > 20) {
+          shadowVtmp = baseV - ((baseV - (this.colorValue[i].hsvShadowColor[2] * baseV / 100)) * 0.5);
+          this.colorValue[i].hsvShadowColor[2] = Math.round(shadowVtmp);
         }
 
         this.colorValue[i].rgbShadowColor = this.hsv2rgb(
@@ -474,7 +488,14 @@ export default {
               ) / 3
             );
           }
-          
+        } else if (baseV > this.colorValue[i].hsvHighlightColor[2]) {
+          this.colorValue[i].hsvHighlightColor[2] = Math.round(
+            (
+              Number(highlight.data[nearColor[0][0]][5]) +
+              Number(highlight.data[nearColor[1][0]][5]) +
+              Number(highlight.data[nearColor[2][0]][5])
+            ) / 3
+          );
         }
 
         this.colorValue[i].rgbHighlightColor = this.hsv2rgb(
