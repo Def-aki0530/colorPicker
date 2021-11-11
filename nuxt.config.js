@@ -4,18 +4,25 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'colorPicker',
+    title: 'AnimeColorDecision',
     htmlAttrs: {
       lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { hid: 'description', name: 'description', content: 'AnimeColorDecision はアニメ塗りにおける色の決定を手助けするサイトです．特定のイラストレーターのイラストから色の情報を学習させ，色彩感性を模倣して色を決定します．' },
+      { name: 'format-detection', content: 'telephone=no' },
+      { hid: 'og:site_name', property: 'og:site_name', content: 'AnimeColorDecision' },
+      { hid: 'og:type', property: 'og:type', content: 'website' },
+      { hid: 'og:url', property: 'og:url', content: 'サイトのURL' },
+      { hid: 'og:title', property: 'og:title', content: 'AnimeColorDecision' },
+      { hid: 'og:description', property: 'og:description', content: 'AnimeColorDecision はアニメ塗りにおける色の決定を手助けするサイトです．特定のイラストレーターのイラストから色の情報を学習させ，色彩感性を模倣して色を決定します．' },
+      { hid: 'og:image', property: 'og:image', content: '画像のURL' },
+      { name: 'twitter:card', content: 'summary' },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
       { 
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Roboto&display=swap" 
