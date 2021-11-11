@@ -15,10 +15,10 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
       { hid: 'og:site_name', property: 'og:site_name', content: 'AnimeColorDecision' },
       { hid: 'og:type', property: 'og:type', content: 'website' },
-      { hid: 'og:url', property: 'og:url', content: 'サイトのURL' },
+      { hid: 'og:url', property: 'og:url', content: 'animecolordecision.netlify.app' },
       { hid: 'og:title', property: 'og:title', content: 'AnimeColorDecision' },
       { hid: 'og:description', property: 'og:description', content: 'AnimeColorDecision はアニメ塗りにおける色の決定を手助けするサイトです．特定のイラストレーターのイラストから色の情報を学習させ，色彩感性を模倣して色を決定します．' },
-      { hid: 'og:image', property: 'og:image', content: '画像のURL' },
+      { hid: 'og:image', property: 'og:image', content: 'animecolordecision.netlify.app/animeColorDecision.png' },
       { name: 'twitter:card', content: 'summary' },
     ],
     link: [
